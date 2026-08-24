@@ -31,9 +31,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, pendi
     { id: 'attendance', label: 'Attendance & Time', icon: Clock, roles: ['admin', 'manager'] },
     { id: 'documents', label: 'Document Repository', icon: FileText, roles: ['admin', 'manager'] },
     { id: 'reports', label: 'Reports & Export', icon: BarChart3, roles: ['admin', 'manager'] },
-    { id: 'portal', label: 'Employee Self-Service', icon: UserCheck, roles: ['admin', 'manager', 'employee'], highlight: true },
-    { id: 'architecture', label: 'Architecture & ERD', icon: Network, roles: ['admin', 'manager', 'employee'] }
+    { id: 'portal', label: 'Employee Self-Service', icon: UserCheck, roles: ['admin', 'manager', 'employee'], highlight: true }
   ];
+
 
   const visibleItems = navItems.filter(item => item.roles.includes(role));
 

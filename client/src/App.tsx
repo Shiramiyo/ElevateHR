@@ -10,7 +10,6 @@ import { Attendance } from './pages/Attendance';
 import { Documents } from './pages/Documents';
 import { Reports } from './pages/Reports';
 import { EmployeePortal } from './pages/EmployeePortal';
-import { ArchitectureViewer } from './pages/ArchitectureViewer';
 import { api } from './services/api';
 
 const AppContent: React.FC = () => {
@@ -20,7 +19,7 @@ const AppContent: React.FC = () => {
 
   // Auto adjust tab when switching to employee role
   useEffect(() => {
-    if (role === 'employee' && activeTab !== 'portal' && activeTab !== 'architecture') {
+    if (role === 'employee' && activeTab !== 'portal') {
       setActiveTab('portal');
     }
   }, [role]);
@@ -58,12 +57,11 @@ const AppContent: React.FC = () => {
         return <Reports />;
       case 'portal':
         return <EmployeePortal />;
-      case 'architecture':
-        return <ArchitectureViewer />;
       default:
         return <Dashboard onNavigate={setActiveTab} />;
     }
   };
+
 
   return (
     <div className="flex h-screen w-screen bg-slate-50 overflow-hidden font-['Plus_Jakarta_Sans',sans-serif]">

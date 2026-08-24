@@ -9,7 +9,9 @@ import {
   FileText,
   Edit2,
   Trash2,
+  UserX,
   Eye,
+
   Mail,
   Phone,
   Building,
@@ -103,6 +105,7 @@ export const Employees: React.FC = () => {
       contractEndDate: '2027-07-31',
       baseSalary: 1200,
       currency: 'USD',
+      password: 'password123',
       nssfNumber: `NSSF-${Math.floor(10000000 + Math.random() * 90000000)}`,
       nationalId: `${Math.floor(100000000 + Math.random() * 900000000)}`,
       address: 'Phnom Penh, Cambodia',
@@ -147,12 +150,22 @@ export const Employees: React.FC = () => {
   };
 
   const handleArchive = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to archive profile for ${name}?`)) return;
+    if (!window.confirm(`Archive account for ${name}? The employee will be deactivated and unable to log in, but historical records will be preserved.`)) return;
     try {
-      await api.deleteEmployee(id);
+      await api.deleteEmployee(id, false);
       fetchEmployees();
     } catch (err) {
       console.error('Failed to archive employee:', err);
+    }
+  };
+
+  const handlePermanentDelete = async (id: string, name: string) => {
+    if (!window.confirm(`⚠️ PERMANENT DELETE: Are you sure you want to permanently delete ${name} from the database? This action CANNOT be undone.`)) return;
+    try {
+      await api.deleteEmployee(id, true);
+      fetchEmployees();
+    } catch (err) {
+      console.error('Failed to permanently delete employee:', err);
     }
   };
 
@@ -317,15 +330,23 @@ export const Employees: React.FC = () => {
                         {emp.status !== 'Archived' && (
                           <button
                             onClick={() => handleArchive(emp.id, `${emp.firstName} ${emp.lastName}`)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Archive Employee"
+                            className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                            title="Archive / Deactivate Employee"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <UserX className="w-4 h-4" />
                           </button>
                         )}
+                        <button
+                          onClick={() => handlePermanentDelete(emp.id, `${emp.firstName} ${emp.lastName}`)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Permanently Delete from Database"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
+
                 ))}
               </tbody>
             </table>

@@ -49,13 +49,28 @@ export const api = {
     return res.json();
   },
 
-  async deleteEmployee(id: string): Promise<{ message: string }> {
-    const res = await fetch(`${API_BASE}/employees/${id}`, {
+  async deleteEmployee(id: string, permanent?: boolean): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/employees/${id}${permanent ? '?permanent=true' : ''}`, {
       method: 'DELETE',
     });
     if (!res.ok) throw new Error('Failed to delete employee');
     return res.json();
   },
+
+  // Auth Login
+  async login(email: string, password?: string): Promise<{ user: Employee; token: string }> {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Login failed');
+    }
+    return res.json();
+  },
+
 
   // Leaves
   async getLeaves(params?: { employeeId?: string; status?: string }): Promise<LeaveRequest[]> {

@@ -857,7 +857,9 @@ app.post('/api/employees', (req, res) => {
     contractEndDate: body.contractEndDate || '2027-12-31',
     baseSalary: Number(body.baseSalary) || 1000,
     currency: body.currency || 'USD',
+    password: body.password || 'password123',
     nssfNumber: body.nssfNumber || `NSSF-${Math.floor(10000000 + Math.random() * 90000000)}`,
+
     nationalId: body.nationalId || `${Math.floor(100000000 + Math.random() * 900000000)}`,
     address: body.address || 'Phnom Penh, Cambodia',
     bankName: body.bankName || 'ABA Bank',
@@ -896,11 +898,22 @@ app.delete('/api/employees/:id', (req, res) => {
   const index = db.employees.findIndex(e => e.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: 'Employee not found' });
 
+  const isPermanent = req.query.permanent === 'true';
+
+  if (isPermanent) {
+    const deletedEmp = db.employees.splice(index, 1)[0];
+    // Also remove their future pending leaves
+    db.leaves = db.leaves.filter(l => l.employeeId !== req.params.id || l.status !== 'Pending');
+    writeDB(db);
+    return res.json({ message: 'Employee permanently deleted from database', employee: deletedEmp });
+  }
+
   // Soft delete / archive
   db.employees[index].status = 'Archived';
   writeDB(db);
   res.json({ message: 'Employee archived successfully', employee: db.employees[index] });
 });
+
 
 // --- LEAVE MANAGEMENT ---
 app.get('/api/leaves', (req, res) => {
@@ -1216,7 +1229,40 @@ app.put('/api/documents/:id/verify', (req, res) => {
   res.json(doc);
 });
 
+// Authentication login endpoint
+app.post('/api/auth/login', (req, res) => {
+  const db = readDB();
+  const { email, password } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  const user = db.employees.find(e => 
+    e.email.toLowerCase() === email.trim().toLowerCase()
+  );
+
+  if (!user) {
+    return res.status(401).json({ error: 'No account found with this email address' });
+  }
+
+  if (user.status === 'Archived') {
+    return res.status(403).json({ error: 'This account has been deactivated/archived' });
+  }
+
+  // If password provided, verify (or allow demo default password123)
+  if (password && user.password && user.password !== password && password !== 'password123') {
+    return res.status(401).json({ error: 'Invalid password. Please check your credentials.' });
+  }
+
+  res.json({
+    user,
+    token: `ehr_token_${user.id}_${Date.now()}`
+  });
+});
+
 // Reset demo database endpoint
+
 app.post('/api/reset-data', (req, res) => {
   const initial = getInitialData();
   writeDB(initial);

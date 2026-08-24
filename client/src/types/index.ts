@@ -40,7 +40,9 @@ export interface Employee {
   nssfNumber: string;
   nationalId: string;
   address: string;
+  password?: string;
   bankName: string;
+
   bankAccountNumber: string;
   emergencyContact: EmergencyContact;
   leaveBalance: LeaveBalance;
