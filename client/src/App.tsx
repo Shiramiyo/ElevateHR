@@ -16,6 +16,7 @@ const AppContent: React.FC = () => {
   const { role } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [pendingLeavesCount, setPendingLeavesCount] = useState<number>(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Auto adjust tab when switching to employee role
   useEffect(() => {
@@ -62,23 +63,27 @@ const AppContent: React.FC = () => {
     }
   };
 
-
   return (
     <div className="flex h-screen w-screen bg-slate-50 overflow-hidden font-['Plus_Jakarta_Sans',sans-serif]">
-      {/* Navigation Sidebar */}
+      {/* Navigation Sidebar (Desktop + Mobile Drawer) */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         pendingLeavesCount={pendingLeavesCount}
+        mobileOpen={mobileMenuOpen}
+        setMobileOpen={setMobileMenuOpen}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Navbar */}
-        <Navbar onRefreshAll={loadPendingCount} />
+        <Navbar
+          onRefreshAll={loadPendingCount}
+          onToggleMobileMenu={() => setMobileMenuOpen(prev => !prev)}
+        />
 
         {/* Scrollable Page Body */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 md:p-8">
           <div className="max-w-7xl mx-auto">
             {renderActivePage()}
           </div>

@@ -8,9 +8,8 @@ import {
   FileText,
   BarChart3,
   UserCheck,
-  Network,
-  Sparkles,
-  ShieldAlert
+  ShieldAlert,
+  X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -18,9 +17,17 @@ interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   pendingLeavesCount?: number;
+  mobileOpen: boolean;
+  setMobileOpen: (open: boolean) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, pendingLeavesCount = 0 }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  activeTab,
+  setActiveTab,
+  pendingLeavesCount = 0,
+  mobileOpen,
+  setMobileOpen
+}) => {
   const { role } = useAuth();
 
   const navItems = [
@@ -34,11 +41,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, pendi
     { id: 'portal', label: 'Employee Self-Service', icon: UserCheck, roles: ['admin', 'manager', 'employee'], highlight: true }
   ];
 
-
   const visibleItems = navItems.filter(item => item.roles.includes(role));
 
-  return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none min-h-screen">
+  const handleNavClick = (id: string) => {
+    setActiveTab(id);
+    setMobileOpen(false);
+  };
+
+  const sidebarContent = (
+    <div className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none h-full">
       {/* Brand Header */}
       <div className="h-16 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
         <div className="flex items-center space-x-2.5">
@@ -54,6 +65,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, pendi
             </span>
           </div>
         </div>
+
+        {/* Mobile Close Button */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Role Badge Indicator */}
@@ -83,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, pendi
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleNavClick(item.id)}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/30 font-semibold'
@@ -115,9 +134,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, pendi
           <span>AES-256 Cloud Encrypted</span>
         </div>
         <div className="text-[11px] text-slate-500">
-          ElevateHR v1.0 • Mid-Market Edition
+          ElevateHR v1.0 • Mobile & Cloud Ready
         </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden md:flex md:h-screen md:sticky md:top-0">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer Overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileOpen(false)}
+          />
+
+          {/* Drawer Slide */}
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-slate-900 z-10 shadow-2xl animate-in slide-in-from-left duration-200">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
