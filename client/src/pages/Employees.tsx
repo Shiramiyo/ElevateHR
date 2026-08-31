@@ -34,14 +34,14 @@ import { exportService } from '../services/exportService';
 import { pdfService } from '../services/pdfService';
 
 const PRESET_AVATARS = [
-  { label: 'Female 1', url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80' },
-  { label: 'Male 1', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80' },
-  { label: 'Male 2', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80' },
-  { label: 'Female 2', url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80' },
-  { label: 'Male 3', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80' },
-  { label: 'Female 3', url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80' },
-  { label: 'Male 4', url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80' },
-  { label: 'Female 4', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Female 1 (Sophea)', url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 1 (Vannak)', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 2 (Jean-Luc)', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Female 2 (Sarah)', url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 3 (Darith)', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Female 3 (Bopha)', url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 4 (Kosal)', url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Female 4 (Sokha)', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80' },
 ];
 
 const NATIONALITIES = [
@@ -72,8 +72,9 @@ export const Employees: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [activeEmployee, setActiveEmployee] = useState<Employee | null>(null);
 
-  // File input ref for portrait
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // File input refs for Add and Edit
+  const addFileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   // Form State for Add / Edit
   const [formData, setFormData] = useState<Partial<Employee>>({
@@ -267,7 +268,6 @@ export const Employees: React.FC = () => {
     { value: 'ExpiringPermits', label: '⚠️ Permits Expiring Soon' },
   ];
 
-  const foreignCount = employees.filter(e => e.isForeignWorker).length;
   const expiringPermitsCount = employees.filter(e => e.isForeignWorker && (e.workPermitStatus === 'Expiring Soon' || e.workPermitStatus === 'Expired')).length;
 
   return (
@@ -520,11 +520,15 @@ export const Employees: React.FC = () => {
         maxWidth="3xl"
       >
         <form onSubmit={handleSaveAdd} className="space-y-5">
-          {/* Portrait Photo Uploader */}
+          {/* Portrait Photo Uploader in Add */}
           <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80">
-            <label className="block text-xs font-bold text-slate-800 mb-2">Employee Portrait (Photo)</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-bold text-slate-800">Employee Portrait (Photo)</label>
+              <span className="text-[11px] text-slate-500 font-medium">Click "Upload Portrait File" or pick a preset</span>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="relative group">
+              <div className="relative group shrink-0">
                 {formData.avatar ? (
                   <img
                     src={formData.avatar}
@@ -541,7 +545,7 @@ export const Employees: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, avatar: '' }))}
-                    className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-1 shadow-xs hover:bg-rose-700"
+                    className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-1 shadow-xs hover:bg-rose-700 transition-colors"
                     title="Remove Photo"
                   >
                     <X className="w-3 h-3" />
@@ -549,41 +553,46 @@ export const Employees: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex-1 space-y-2 text-center sm:text-left">
+              <div className="flex-1 space-y-2.5 text-center sm:text-left w-full">
                 <div className="flex items-center gap-2 justify-center sm:justify-start">
                   <input
                     type="file"
-                    ref={fileInputRef}
+                    ref={addFileInputRef}
                     onChange={handleImageUpload}
                     accept="image/*"
                     className="hidden"
                   />
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl shadow-2xs flex items-center gap-1.5"
+                    onClick={() => addFileInputRef.current?.click()}
+                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-all"
                   >
-                    <Upload className="w-3.5 h-3.5 text-emerald-600" />
+                    <Upload className="w-3.5 h-3.5" />
                     <span>Upload Portrait File</span>
                   </button>
-                  <span className="text-[11px] text-slate-400">PNG, JPG up to 5MB</span>
+                  <span className="text-[11px] text-slate-400">PNG, JPG, WebP up to 5MB</span>
                 </div>
 
                 {/* Quick Presets Gallery */}
                 <div>
-                  <span className="text-[11px] text-slate-500 block mb-1">Or choose preset avatar:</span>
+                  <span className="text-[11px] text-slate-500 block mb-1 font-medium">Or choose a preset persona photo:</span>
                   <div className="flex items-center gap-1.5 justify-center sm:justify-start flex-wrap">
                     {PRESET_AVATARS.map((p, idx) => (
-                      <img
+                      <button
+                        type="button"
                         key={idx}
-                        src={p.url}
-                        alt={p.label}
                         onClick={() => setFormData(prev => ({ ...prev, avatar: p.url }))}
-                        className={`w-7 h-7 rounded-lg object-cover cursor-pointer border transition-all ${
-                          formData.avatar === p.url ? 'border-emerald-600 ring-2 ring-emerald-500/30 scale-110' : 'border-slate-200 opacity-70 hover:opacity-100'
+                        className={`p-0.5 rounded-lg border-2 transition-all ${
+                          formData.avatar === p.url ? 'border-emerald-600 ring-2 ring-emerald-500/30 scale-110' : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-300'
                         }`}
                         title={p.label}
-                      />
+                      >
+                        <img
+                          src={p.url}
+                          alt={p.label}
+                          className="w-7 h-7 rounded-md object-cover"
+                        />
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -827,9 +836,13 @@ export const Employees: React.FC = () => {
         <form onSubmit={handleSaveEdit} className="space-y-5">
           {/* Portrait Photo Uploader in Edit */}
           <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80">
-            <label className="block text-xs font-bold text-slate-800 mb-2">Update Portrait (Photo)</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-bold text-slate-800">Update Employee Portrait</label>
+              <span className="text-[11px] text-slate-500 font-medium">Click "Change Photo" or pick a preset</span>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="relative">
+              <div className="relative group shrink-0">
                 {formData.avatar ? (
                   <img
                     src={formData.avatar}
@@ -846,7 +859,7 @@ export const Employees: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, avatar: '' }))}
-                    className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-1 shadow-xs hover:bg-rose-700"
+                    className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-1 shadow-xs hover:bg-rose-700 transition-colors"
                     title="Remove Photo"
                   >
                     <X className="w-3 h-3" />
@@ -854,36 +867,43 @@ export const Employees: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex-1 space-y-2 text-center sm:text-left">
+              <div className="flex-1 space-y-2.5 text-center sm:text-left w-full">
                 <div className="flex items-center gap-2 justify-center sm:justify-start">
                   <input
                     type="file"
-                    id="edit-avatar-input"
+                    ref={editFileInputRef}
                     onChange={handleImageUpload}
                     accept="image/*"
                     className="hidden"
                   />
-                  <label
-                    htmlFor="edit-avatar-input"
-                    className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl shadow-2xs cursor-pointer flex items-center gap-1.5"
+                  <button
+                    type="button"
+                    onClick={() => editFileInputRef.current?.click()}
+                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-all"
                   >
-                    <Upload className="w-3.5 h-3.5 text-emerald-600" />
+                    <Upload className="w-3.5 h-3.5" />
                     <span>Upload New Photo</span>
-                  </label>
+                  </button>
+                  <span className="text-[11px] text-slate-400">PNG, JPG, WebP up to 5MB</span>
                 </div>
 
                 <div className="flex items-center gap-1.5 justify-center sm:justify-start flex-wrap">
                   {PRESET_AVATARS.map((p, idx) => (
-                    <img
+                    <button
+                      type="button"
                       key={idx}
-                      src={p.url}
-                      alt={p.label}
                       onClick={() => setFormData(prev => ({ ...prev, avatar: p.url }))}
-                      className={`w-7 h-7 rounded-lg object-cover cursor-pointer border transition-all ${
-                        formData.avatar === p.url ? 'border-emerald-600 ring-2 ring-emerald-500/30 scale-110' : 'border-slate-200 opacity-70 hover:opacity-100'
+                      className={`p-0.5 rounded-lg border-2 transition-all ${
+                        formData.avatar === p.url ? 'border-emerald-600 ring-2 ring-emerald-500/30 scale-110' : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-300'
                       }`}
                       title={p.label}
-                    />
+                    >
+                      <img
+                        src={p.url}
+                        alt={p.label}
+                        className="w-7 h-7 rounded-md object-cover"
+                      />
+                    </button>
                   ))}
                 </div>
               </div>

@@ -149,27 +149,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
                 Switch Role / Demo Persona
               </div>
 
-              {/* Admin Persona */}
+              {/* HR Admin Persona */}
               <button
-                onClick={() => {
-                  switchUser('EHR-1001');
-                }}
+                onClick={() => switchUser('EHR-1001')}
                 className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
                   currentUser?.id === 'EHR-1001' ? 'bg-emerald-50/60 font-bold text-emerald-900' : 'text-slate-700'
                 }`}
               >
                 <div>
                   <div className="font-semibold text-slate-900">Sophea Chan (HR Admin)</div>
-                  <div className="text-[11px] text-slate-500">Full System & Payroll Admin</div>
+                  <div className="text-[11px] text-slate-500">HR Admin • Full Access</div>
                 </div>
                 {currentUser?.id === 'EHR-1001' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
               </button>
 
-              {/* Manager Persona */}
+              {/* Engineering Manager Persona */}
               <button
-                onClick={() => {
-                  switchUser('EHR-1002');
-                }}
+                onClick={() => switchUser('EHR-1002')}
                 className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
                   currentUser?.id === 'EHR-1002' ? 'bg-emerald-50/60 font-bold text-emerald-900' : 'text-slate-700'
                 }`}
@@ -181,36 +177,66 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
                 {currentUser?.id === 'EHR-1002' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
               </button>
 
-              {/* Employee Persona */}
+              {/* Design Manager Expat Persona */}
               <button
-                onClick={() => {
-                  switchUser('EHR-1003');
-                }}
-                className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
-                  currentUser?.id === 'EHR-1003' ? 'bg-emerald-50/60 font-bold text-emerald-900' : 'text-slate-700'
-                }`}
-              >
-                <div>
-                  <div className="font-semibold text-slate-900">Darith Sok (Employee)</div>
-                  <div className="text-[11px] text-slate-500">Self-Service Portal • Payslips</div>
-                </div>
-                {currentUser?.id === 'EHR-1003' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
-              </button>
-
-              {/* Another Employee Persona */}
-              <button
-                onClick={() => {
-                  switchUser('EHR-1004');
-                }}
+                onClick={() => switchUser('EHR-1004')}
                 className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
                   currentUser?.id === 'EHR-1004' ? 'bg-emerald-50/60 font-bold text-emerald-900' : 'text-slate-700'
                 }`}
               >
                 <div>
-                  <div className="font-semibold text-slate-900">Bopha Chea (Employee)</div>
-                  <div className="text-[11px] text-slate-500">Design Specialist • Leave Requests</div>
+                  <div className="font-semibold text-slate-900 flex items-center gap-1">
+                    <span>Sarah Jenkins (Manager)</span>
+                    <span className="text-[9px] px-1 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200">Expat</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">Design & UX Advisor</div>
                 </div>
                 {currentUser?.id === 'EHR-1004' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+              </button>
+
+              {/* Cambodian Employee Persona - Bopha Chea */}
+              <button
+                onClick={() => switchUser('EHR-1006')}
+                className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
+                  currentUser?.id === 'EHR-1006' ? 'bg-emerald-50/60 font-bold text-emerald-900' : 'text-slate-700'
+                }`}
+              >
+                <div>
+                  <div className="font-semibold text-slate-900">Bopha Chea (Employee)</div>
+                  <div className="text-[11px] text-slate-500">Product Designer (UI/UX) • Self-Service</div>
+                </div>
+                {currentUser?.id === 'EHR-1006' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+              </button>
+
+              {/* Cambodian Employee Persona - Darith Sok */}
+              <button
+                onClick={() => switchUser('EHR-1005')}
+                className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
+                  currentUser?.id === 'EHR-1005' ? 'bg-emerald-50/60 font-bold text-emerald-900' : 'text-slate-700'
+                }`}
+              >
+                <div>
+                  <div className="font-semibold text-slate-900">Darith Sok (Employee)</div>
+                  <div className="text-[11px] text-slate-500">Full-Stack Dev • Self-Service Portal</div>
+                </div>
+                {currentUser?.id === 'EHR-1005' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+              </button>
+
+              {/* Foreign Worker Employee Persona - Jean-Luc Dubois */}
+              <button
+                onClick={() => switchUser('EHR-1003')}
+                className={`w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
+                  currentUser?.id === 'EHR-1003' ? 'bg-emerald-50/60 font-bold text-emerald-900' : 'text-slate-700'
+                }`}
+              >
+                <div>
+                  <div className="font-semibold text-slate-900 flex items-center gap-1">
+                    <span>Jean-Luc Dubois (Employee)</span>
+                    <span className="text-[9px] px-1 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200">Expat</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">Principal Cloud Architect • FWCMS</div>
+                </div>
+                {currentUser?.id === 'EHR-1003' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
               </button>
             </div>
           )}

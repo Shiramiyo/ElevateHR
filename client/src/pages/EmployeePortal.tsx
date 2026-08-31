@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Clock,
   Calendar,
@@ -12,7 +12,9 @@ import {
   Laptop,
   Building,
   User,
-  ShieldCheck
+  ShieldCheck,
+  Camera,
+  X
 } from 'lucide-react';
 import { Badge } from '../components/Badge';
 import { Modal } from '../components/Modal';
@@ -21,12 +23,29 @@ import { api } from '../services/api';
 import { pdfService } from '../services/pdfService';
 import { LeaveRequest, PayrollRun, DocumentItem } from '../types';
 
+const PRESET_AVATARS = [
+  { label: 'Female 1 (Sophea)', url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 1 (Vannak)', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 2 (Jean-Luc)', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Female 2 (Sarah)', url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 3 (Darith)', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Female 3 (Bopha)', url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Male 4 (Kosal)', url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80' },
+  { label: 'Female 4 (Sokha)', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80' },
+];
+
 export const EmployeePortal: React.FC = () => {
   const { currentUser, isClockedIn, setIsClockedIn, clockInTime, setClockInTime, refreshUser } = useAuth();
   const [myLeaves, setMyLeaves] = useState<LeaveRequest[]>([]);
   const [payrollRuns, setPayrollRuns] = useState<PayrollRun[]>([]);
   const [myDocs, setMyDocs] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Avatar Modal State
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState('');
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
 
   // Apply Leave Modal
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -131,6 +150,43 @@ export const EmployeePortal: React.FC = () => {
     }
   };
 
+  const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Photo size must be less than 5MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSelectedAvatar(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleOpenAvatarModal = () => {
+    setSelectedAvatar(currentUser?.avatar || '');
+    setIsAvatarModalOpen(true);
+  };
+
+  const handleSaveAvatar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser) return;
+    try {
+      setAvatarSaving(true);
+      await api.updateEmployee(currentUser.id, { avatar: selectedAvatar });
+      await refreshUser();
+      setIsAvatarModalOpen(false);
+      loadPortalData();
+    } catch (err) {
+      console.error('Failed to update avatar:', err);
+    } finally {
+      setAvatarSaving(false);
+    }
+  };
+
   // Find user payslip items in past payroll runs
   const myPayslips = payrollRuns.flatMap(run =>
     run.items
@@ -145,18 +201,23 @@ export const EmployeePortal: React.FC = () => {
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center space-x-4">
-          {currentUser.avatar ? (
-            <img
-              src={currentUser.avatar}
-              alt={`${currentUser.firstName} ${currentUser.lastName}`}
-              className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg shadow-emerald-500/20"
-            />
-          ) : (
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              {currentUser.firstName[0]}
-              {currentUser.lastName[0]}
+          <div className="relative group cursor-pointer" onClick={handleOpenAvatarModal} title="Click to Change Portrait Photo">
+            {currentUser.avatar ? (
+              <img
+                src={currentUser.avatar}
+                alt={`${currentUser.firstName} ${currentUser.lastName}`}
+                className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg shadow-emerald-500/20 group-hover:brightness-75 transition-all"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:brightness-75 transition-all">
+                {currentUser.firstName[0]}
+                {currentUser.lastName[0]}
+              </div>
+            )}
+            <div className="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+              <Camera className="w-5 h-5 text-white drop-shadow" />
             </div>
-          )}
+          </div>
           <div>
             <div className="flex items-center space-x-2 flex-wrap gap-y-1">
               <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -172,9 +233,19 @@ export const EmployeePortal: React.FC = () => {
                 </span>
               )}
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-1">
-              Welcome back, {currentUser.firstName}!
-            </h1>
+            <div className="flex items-center gap-3 mt-1 flex-wrap">
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+                Welcome back, {currentUser.firstName}!
+              </h1>
+              <button
+                onClick={handleOpenAvatarModal}
+                className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-emerald-300 hover:text-white border border-emerald-500/30 hover:border-emerald-400 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all"
+                title="Change your portrait photo"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Change Photo</span>
+              </button>
+            </div>
             <p className="text-xs text-slate-300 mt-0.5">
               {currentUser.position} • {currentUser.department} • ID: <span className="font-mono">{currentUser.id}</span>
             </p>
@@ -574,6 +645,108 @@ export const EmployeePortal: React.FC = () => {
               className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md shadow-emerald-700/20"
             >
               Upload
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Change Portrait Photo Modal */}
+      <Modal
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        title="Update Profile Portrait"
+        subtitle={`Employee: ${currentUser.firstName} ${currentUser.lastName} (${currentUser.id})`}
+        maxWidth="lg"
+      >
+        <form onSubmit={handleSaveAvatar} className="space-y-4">
+          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80">
+            <label className="block text-xs font-bold text-slate-800 mb-2">Live Photo Preview</label>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="relative group shrink-0">
+                {selectedAvatar ? (
+                  <img
+                    src={selectedAvatar}
+                    alt="Preview"
+                    className="w-20 h-20 rounded-2xl object-cover border-2 border-emerald-500 shadow-sm"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-slate-200 text-slate-500 flex flex-col items-center justify-center text-xs font-semibold border-2 border-dashed border-slate-300">
+                    <Camera className="w-6 h-6 mb-1 text-slate-400" />
+                    <span>No Photo</span>
+                  </div>
+                )}
+                {selectedAvatar && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAvatar('')}
+                    className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-1 shadow-xs hover:bg-rose-700 transition-colors"
+                    title="Remove Photo"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex-1 space-y-2.5 text-center sm:text-left w-full">
+                <div className="flex items-center gap-2 justify-center sm:justify-start">
+                  <input
+                    type="file"
+                    ref={avatarFileInputRef}
+                    onChange={handleAvatarFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => avatarFileInputRef.current?.click()}
+                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-all"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload Portrait File</span>
+                  </button>
+                  <span className="text-[11px] text-slate-400">PNG, JPG, WebP up to 5MB</span>
+                </div>
+
+                <div>
+                  <span className="text-[11px] text-slate-500 block mb-1 font-medium">Or pick a preset avatar photo:</span>
+                  <div className="flex items-center gap-1.5 justify-center sm:justify-start flex-wrap">
+                    {PRESET_AVATARS.map((p, idx) => (
+                      <button
+                        type="button"
+                        key={idx}
+                        onClick={() => setSelectedAvatar(p.url)}
+                        className={`p-0.5 rounded-lg border-2 transition-all ${
+                          selectedAvatar === p.url ? 'border-emerald-600 ring-2 ring-emerald-500/30 scale-110' : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-300'
+                        }`}
+                        title={p.label}
+                      >
+                        <img
+                          src={p.url}
+                          alt={p.label}
+                          className="w-7 h-7 rounded-md object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setIsAvatarModalOpen(false)}
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={avatarSaving}
+              className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md shadow-emerald-700/20 flex items-center gap-1.5"
+            >
+              {avatarSaving ? <span>Saving...</span> : <span>Save Portrait Photo</span>}
             </button>
           </div>
         </form>
