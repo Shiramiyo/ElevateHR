@@ -157,6 +157,32 @@ export const LeaveManagement: React.FC = () => {
         </div>
       </div>
 
+      {/* Cambodia Labour Law Statutory Reference Banner */}
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 rounded-2xl p-4 text-white border border-emerald-800/40 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-start space-x-3">
+            <div className="p-2 bg-emerald-500/20 text-emerald-300 rounded-xl border border-emerald-500/30 shrink-0">
+              <CalendarCheck2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  Cambodia Labour Law Statutory Leave Standards
+                </h3>
+                <span className="text-[10px] px-2 py-0.2 bg-white/10 rounded font-mono text-slate-300">
+                  MoLVT Compliant
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                • <strong>Annual Leave (Art. 166):</strong> 18 days/yr (+1 extra day per 3 yrs continuous service) &nbsp;|&nbsp;
+                • <strong>Special Leave (Prakas 267):</strong> Up to 7 days/yr for family events &nbsp;|&nbsp;
+                • <strong>Maternity Leave (Art. 182):</strong> 90 calendar days
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Filter Tabs */}
       <div className="flex items-center space-x-2 border-b border-slate-200 pb-3">
         {['All', 'Pending', 'Approved', 'Rejected'].map(status => (
@@ -332,17 +358,20 @@ export const LeaveManagement: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Leave Category *</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Leave Category (Cambodia Labour Law) *</label>
             <select
               value={newLeaveData.leaveType}
               onChange={e => setNewLeaveData({ ...newLeaveData, leaveType: e.target.value })}
-              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:outline-none font-semibold text-slate-800"
             >
-              <option value="Annual Leave">Annual Leave (18 days/yr standard)</option>
-              <option value="Sick Leave">Sick Leave (10 days/yr)</option>
-              <option value="Casual Leave">Casual Leave (5 days/yr)</option>
-              <option value="Maternity Leave">Maternity Leave (90 days)</option>
-              <option value="Unpaid Leave">Unpaid Leave</option>
+              <option value="Annual Leave">Annual Leave (Art. 166: 18 days/yr + seniority bonus)</option>
+              <option value="Special Leave (Family Events)">Special Leave (Prakas 267: 7 days/yr family events)</option>
+              <option value="Sick Leave">Sick Leave (Prakas 084: 10 days paid / medical cert)</option>
+              <option value="Maternity Leave">Maternity Leave (Art. 182: 90 calendar days)</option>
+              <option value="Paternity Leave">Paternity Leave (3 days special leave)</option>
+              <option value="Marriage Leave">Marriage Leave (3 days special leave)</option>
+              <option value="Bereavement Leave">Bereavement Leave (3 days special leave)</option>
+              <option value="Unpaid Leave">Unpaid Leave (Mutually agreed)</option>
             </select>
           </div>
 

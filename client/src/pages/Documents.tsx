@@ -83,7 +83,7 @@ export const Documents: React.FC = () => {
     }
   };
 
-  const categories = ['All', 'Identification', 'Legal', 'Career', 'General'];
+  const categories = ['All', 'Identification', 'Work Permit & Visas', 'Legal', 'Career', 'General'];
 
   const filteredDocs = documents.filter(d => {
     const matchSearch =
@@ -257,14 +257,16 @@ export const Documents: React.FC = () => {
             <select
               value={uploadData.docType}
               onChange={e => setUploadData({ ...uploadData, docType: e.target.value })}
-              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none"
+              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none font-semibold text-slate-800"
             >
-              <option value="NSSF Card">NSSF Card (Cambodia)</option>
-              <option value="National ID / Passport">National ID / Passport</option>
-              <option value="Employment Contract">Employment Contract</option>
+              <option value="Foreign Work Permit (MoLVT / FWCMS)">Foreign Work Permit (MoLVT / FWCMS Card)</option>
+              <option value="Passport & EB Visa">Passport & Cambodia EB Visa</option>
+              <option value="NSSF Card">NSSF Member Card (Cambodia)</option>
+              <option value="National ID / Passport">National ID Card / Resident Card</option>
+              <option value="Employment Contract">Employment Contract (FDC / UDC)</option>
               <option value="CV / Resume">CV / Resume</option>
               <option value="Certificate">Degree / Professional Certificate</option>
-              <option value="Other Document">Other Document</option>
+              <option value="Other Document">Other Compliance Document</option>
             </select>
           </div>
 
@@ -275,6 +277,7 @@ export const Documents: React.FC = () => {
               onChange={e => setUploadData({ ...uploadData, category: e.target.value })}
               className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none"
             >
+              <option value="Work Permit & Visas">Work Permit & Visas</option>
               <option value="Identification">Identification</option>
               <option value="Legal">Legal</option>
               <option value="Career">Career</option>

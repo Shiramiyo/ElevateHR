@@ -155,16 +155,16 @@ export const pdfService = {
       `${e.firstName} ${e.lastName}`,
       e.department,
       e.position,
-      e.contractType,
+      e.nationality || 'Cambodian',
+      e.isForeignWorker ? (e.workPermitStatus || 'Valid') : 'Local (N/A)',
       `$${e.baseSalary}`,
       e.status,
-      e.phone,
-      e.email
+      e.phone
     ]);
 
     autoTable(doc, {
       startY: 38,
-      head: [['ID', 'Full Name', 'Department', 'Position', 'Contract', 'Base Salary', 'Status', 'Phone', 'Email']],
+      head: [['ID', 'Full Name', 'Department', 'Position', 'Nationality', 'Work Permit', 'Base Salary', 'Status', 'Phone']],
       body: tableData,
       theme: 'striped',
       headStyles: { fillColor: [15, 23, 42], textColor: 255 },

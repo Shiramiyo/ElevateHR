@@ -11,12 +11,13 @@ export const api = {
   },
 
   // Employees
-  async getEmployees(params?: { search?: string; department?: string; status?: string; role?: string }): Promise<Employee[]> {
+  async getEmployees(params?: { search?: string; department?: string; status?: string; role?: string; origin?: string }): Promise<Employee[]> {
     const query = new URLSearchParams();
     if (params?.search) query.append('search', params.search);
     if (params?.department) query.append('department', params.department);
     if (params?.status) query.append('status', params.status);
     if (params?.role) query.append('role', params.role);
+    if (params?.origin) query.append('origin', params.origin);
     
     const res = await fetch(`${API_BASE}/employees?${query.toString()}`);
     if (!res.ok) throw new Error('Failed to fetch employees');

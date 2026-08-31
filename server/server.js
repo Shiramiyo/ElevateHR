@@ -11,6 +11,18 @@ app.use(express.json({ limit: '10mb' }));
 
 const DATA_FILE = path.join(__dirname, 'data', 'database.json');
 
+// Helper to calculate Work Permit status based on expiry date
+function calculateWorkPermitStatus(emp) {
+  if (!emp.isForeignWorker) return 'Not Applicable';
+  if (!emp.workPermitExpiryDate) return 'Pending Renewal';
+  const today = new Date('2026-08-24');
+  const expiry = new Date(emp.workPermitExpiryDate);
+  const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return 'Expired';
+  if (diffDays <= 60) return 'Expiring Soon';
+  return 'Valid';
+}
+
 // Initialize seed data if file doesn't exist
 function getInitialData() {
   return {
@@ -37,16 +49,22 @@ function getInitialData() {
         address: "#45 Street 310, BKK1, Phnom Penh, Cambodia",
         bankName: "ABA Bank",
         bankAccountNumber: "001 839 201",
+        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Dara Chan",
           relationship: "Spouse",
           phone: "+855 12 999 888"
         },
         leaveBalance: {
-          annual: { total: 18, used: 3, remaining: 15 },
+          annual: { total: 19, used: 3, remaining: 16 }, // 18 + 1 seniority bonus (>3 yrs)
+          special: { total: 7, used: 1, remaining: 6 }, // Cambodia Labour Law Art. 169 & Prakas 267
+          casual: { total: 7, used: 1, remaining: 6 },
           sick: { total: 10, used: 1, remaining: 9 },
-          casual: { total: 5, used: 0, remaining: 5 },
           maternity: { total: 90, used: 0, remaining: 90 },
+          paternity: { total: 0, used: 0, remaining: 0 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       },
@@ -72,21 +90,123 @@ function getInitialData() {
         address: "#12B Street 51, Daun Penh, Phnom Penh, Cambodia",
         bankName: "ABA Bank",
         bankAccountNumber: "002 948 112",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Srey Leak",
           relationship: "Spouse",
           phone: "+855 98 111 222"
         },
         leaveBalance: {
-          annual: { total: 18, used: 6, remaining: 12 },
+          annual: { total: 19, used: 6, remaining: 13 },
+          special: { total: 7, used: 2, remaining: 5 },
+          casual: { total: 7, used: 2, remaining: 5 },
           sick: { total: 10, used: 2, remaining: 8 },
-          casual: { total: 5, used: 1, remaining: 4 },
           maternity: { total: 0, used: 0, remaining: 0 },
+          paternity: { total: 3, used: 0, remaining: 3 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       },
       {
         id: "EHR-1003",
+        firstName: "Jean-Luc",
+        lastName: "Dubois",
+        email: "jeanluc.dubois@elevatehr.com",
+        phone: "+855 78 990 112",
+        gender: "Male",
+        dateOfBirth: "1985-06-12",
+        position: "Principal Cloud Architect",
+        department: "Engineering",
+        role: "employee",
+        status: "Active",
+        contractType: "Full-time",
+        contractStartDate: "2023-01-15",
+        contractEndDate: "2027-01-14",
+        baseSalary: 3800,
+        currency: "USD",
+        nssfNumber: "NSSF-77192083",
+        nationalId: "PASSPORT-FR-99201",
+        address: "#88 Sihanouk Blvd, Chamkarmon, Phnom Penh, Cambodia",
+        bankName: "ABA Bank",
+        bankAccountNumber: "009 881 294",
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80",
+        nationality: "French",
+        isForeignWorker: true,
+        passportNumber: "FR-9821039A",
+        passportExpiryDate: "2029-05-20",
+        visaType: "EB Business Visa (1-Year)",
+        visaExpiryDate: "2027-01-14",
+        workPermitNumber: "FWCMS-2026-881920",
+        workPermitIssueDate: "2026-01-15",
+        workPermitExpiryDate: "2027-01-14",
+        workPermitStatus: "Valid",
+        emergencyContact: {
+          name: "Claire Dubois",
+          relationship: "Spouse",
+          phone: "+33 6 12 34 56 78"
+        },
+        leaveBalance: {
+          annual: { total: 18, used: 4, remaining: 14 },
+          special: { total: 7, used: 0, remaining: 7 },
+          casual: { total: 7, used: 0, remaining: 7 },
+          sick: { total: 10, used: 1, remaining: 9 },
+          maternity: { total: 0, used: 0, remaining: 0 },
+          paternity: { total: 3, used: 0, remaining: 3 },
+          unpaid: { total: 0, used: 0, remaining: 0 }
+        }
+      },
+      {
+        id: "EHR-1004",
+        firstName: "Sarah",
+        lastName: "Jenkins",
+        email: "sarah.jenkins@elevatehr.com",
+        phone: "+855 81 333 999",
+        gender: "Female",
+        dateOfBirth: "1990-10-08",
+        position: "Design & UX Advisor",
+        department: "Design",
+        role: "manager",
+        status: "Active",
+        contractType: "Contract",
+        contractStartDate: "2024-09-25",
+        contractEndDate: "2026-09-24",
+        baseSalary: 3200,
+        currency: "USD",
+        nssfNumber: "NSSF-44810293",
+        nationalId: "PASSPORT-AU-33910",
+        address: "#19 Street 240, Daun Penh, Phnom Penh, Cambodia",
+        bankName: "ABA Bank",
+        bankAccountNumber: "008 192 773",
+        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80",
+        nationality: "Australian",
+        isForeignWorker: true,
+        passportNumber: "AU-6628190B",
+        passportExpiryDate: "2028-08-15",
+        visaType: "EB Business Visa (1-Year)",
+        visaExpiryDate: "2026-09-24",
+        workPermitNumber: "FWCMS-2025-449102",
+        workPermitIssueDate: "2025-09-25",
+        workPermitExpiryDate: "2026-09-24", // Expiring in ~30 days relative to 2026-08-24
+        workPermitStatus: "Expiring Soon",
+        emergencyContact: {
+          name: "David Jenkins",
+          relationship: "Parent",
+          phone: "+61 4 1234 5678"
+        },
+        leaveBalance: {
+          annual: { total: 18, used: 5, remaining: 13 },
+          special: { total: 7, used: 2, remaining: 5 },
+          casual: { total: 7, used: 2, remaining: 5 },
+          sick: { total: 10, used: 1, remaining: 9 },
+          maternity: { total: 90, used: 0, remaining: 90 },
+          paternity: { total: 0, used: 0, remaining: 0 },
+          unpaid: { total: 0, used: 0, remaining: 0 }
+        }
+      },
+      {
+        id: "EHR-1005",
         firstName: "Darith",
         lastName: "Sok",
         email: "darith.sok@elevatehr.com",
@@ -107,6 +227,10 @@ function getInitialData() {
         address: "#88 Street 271, Toul Kork, Phnom Penh, Cambodia",
         bankName: "Canadia Bank",
         bankAccountNumber: "110 394 885",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Sokha Sok",
           relationship: "Parent",
@@ -114,14 +238,16 @@ function getInitialData() {
         },
         leaveBalance: {
           annual: { total: 18, used: 4, remaining: 14 },
+          special: { total: 7, used: 0, remaining: 7 },
+          casual: { total: 7, used: 0, remaining: 7 },
           sick: { total: 10, used: 0, remaining: 10 },
-          casual: { total: 5, used: 0, remaining: 5 },
           maternity: { total: 0, used: 0, remaining: 0 },
+          paternity: { total: 3, used: 0, remaining: 3 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       },
       {
-        id: "EHR-1004",
+        id: "EHR-1006",
         firstName: "Bopha",
         lastName: "Chea",
         email: "bopha.chea@elevatehr.com",
@@ -142,6 +268,10 @@ function getInitialData() {
         address: "#99 Russian Blvd, Sen Sok, Phnom Penh, Cambodia",
         bankName: "ABA Bank",
         bankAccountNumber: "003 481 990",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Narith Chea",
           relationship: "Sibling",
@@ -149,14 +279,16 @@ function getInitialData() {
         },
         leaveBalance: {
           annual: { total: 18, used: 5, remaining: 13 },
+          special: { total: 7, used: 2, remaining: 5 },
+          casual: { total: 7, used: 2, remaining: 5 },
           sick: { total: 10, used: 1, remaining: 9 },
-          casual: { total: 5, used: 2, remaining: 3 },
           maternity: { total: 90, used: 0, remaining: 90 },
+          paternity: { total: 0, used: 0, remaining: 0 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       },
       {
-        id: "EHR-1005",
+        id: "EHR-1007",
         firstName: "Kosal",
         lastName: "Meng",
         email: "kosal.meng@elevatehr.com",
@@ -177,6 +309,10 @@ function getInitialData() {
         address: "#17 Street 2004, Sen Sok, Phnom Penh, Cambodia",
         bankName: "ACLEDA Bank",
         bankAccountNumber: "290 182 994",
+        avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Chanthy Meng",
           relationship: "Spouse",
@@ -184,14 +320,16 @@ function getInitialData() {
         },
         leaveBalance: {
           annual: { total: 18, used: 2, remaining: 16 },
+          special: { total: 7, used: 0, remaining: 7 },
+          casual: { total: 7, used: 0, remaining: 7 },
           sick: { total: 10, used: 0, remaining: 10 },
-          casual: { total: 5, used: 0, remaining: 5 },
           maternity: { total: 0, used: 0, remaining: 0 },
+          paternity: { total: 3, used: 0, remaining: 3 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       },
       {
-        id: "EHR-1006",
+        id: "EHR-1008",
         firstName: "Sreypov",
         lastName: "Heng",
         email: "sreypov.heng@elevatehr.com",
@@ -212,6 +350,10 @@ function getInitialData() {
         address: "#22 Monivong Blvd, Chamkarmon, Phnom Penh, Cambodia",
         bankName: "ABA Bank",
         bankAccountNumber: "004 883 192",
+        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Sothy Heng",
           relationship: "Parent",
@@ -219,14 +361,16 @@ function getInitialData() {
         },
         leaveBalance: {
           annual: { total: 18, used: 1, remaining: 17 },
+          special: { total: 7, used: 0, remaining: 7 },
+          casual: { total: 7, used: 0, remaining: 7 },
           sick: { total: 10, used: 0, remaining: 10 },
-          casual: { total: 5, used: 0, remaining: 5 },
           maternity: { total: 90, used: 0, remaining: 90 },
+          paternity: { total: 0, used: 0, remaining: 0 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       },
       {
-        id: "EHR-1007",
+        id: "EHR-1009",
         firstName: "Phanit",
         lastName: "Keo",
         email: "phanit.keo@elevatehr.com",
@@ -247,6 +391,10 @@ function getInitialData() {
         address: "#61 Street 150, Toul Kork, Phnom Penh, Cambodia",
         bankName: "ABA Bank",
         bankAccountNumber: "005 192 847",
+        avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Leakena Keo",
           relationship: "Spouse",
@@ -254,14 +402,16 @@ function getInitialData() {
         },
         leaveBalance: {
           annual: { total: 18, used: 2, remaining: 16 },
+          special: { total: 7, used: 0, remaining: 7 },
+          casual: { total: 7, used: 0, remaining: 7 },
           sick: { total: 10, used: 1, remaining: 9 },
-          casual: { total: 5, used: 0, remaining: 5 },
           maternity: { total: 0, used: 0, remaining: 0 },
+          paternity: { total: 3, used: 0, remaining: 3 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       },
       {
-        id: "EHR-1008",
+        id: "EHR-1010",
         firstName: "Thida",
         lastName: "Pich",
         email: "thida.pich@elevatehr.com",
@@ -282,6 +432,10 @@ function getInitialData() {
         address: "#10 Street 337, Toul Kork, Phnom Penh, Cambodia",
         bankName: "Wing Bank",
         bankAccountNumber: "991 827 364",
+        avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&auto=format&fit=crop&q=80",
+        nationality: "Cambodian",
+        isForeignWorker: false,
+        workPermitStatus: "Not Applicable",
         emergencyContact: {
           name: "Chhay Pich",
           relationship: "Parent",
@@ -289,9 +443,11 @@ function getInitialData() {
         },
         leaveBalance: {
           annual: { total: 18, used: 0, remaining: 18 },
+          special: { total: 7, used: 0, remaining: 7 },
+          casual: { total: 7, used: 0, remaining: 7 },
           sick: { total: 10, used: 0, remaining: 10 },
-          casual: { total: 5, used: 0, remaining: 5 },
           maternity: { total: 90, used: 0, remaining: 90 },
+          paternity: { total: 0, used: 0, remaining: 0 },
           unpaid: { total: 0, used: 0, remaining: 0 }
         }
       }
@@ -664,6 +820,42 @@ function getInitialData() {
       {
         id: "DOC-1001",
         employeeId: "EHR-1003",
+        employeeName: "Jean-Luc Dubois",
+        docType: "Foreign Work Permit (MoLVT / FWCMS)",
+        fileName: "FWCMS_WorkPermit_JeanLuc_2026.pdf",
+        fileSize: "1.4 MB",
+        uploadedAt: "2026-01-15",
+        status: "Verified",
+        verifiedBy: "Sophea Chan",
+        category: "Work Permit & Visas"
+      },
+      {
+        id: "DOC-1002",
+        employeeId: "EHR-1003",
+        employeeName: "Jean-Luc Dubois",
+        docType: "Passport & EB Visa",
+        fileName: "Passport_EB_Visa_JeanLuc.pdf",
+        fileSize: "2.1 MB",
+        uploadedAt: "2026-01-15",
+        status: "Verified",
+        verifiedBy: "Sophea Chan",
+        category: "Work Permit & Visas"
+      },
+      {
+        id: "DOC-1003",
+        employeeId: "EHR-1004",
+        employeeName: "Sarah Jenkins",
+        docType: "Foreign Work Permit (MoLVT / FWCMS)",
+        fileName: "MoLVT_WorkPermit_SarahJenkins_2025.pdf",
+        fileSize: "1.8 MB",
+        uploadedAt: "2025-09-25",
+        status: "Verified",
+        verifiedBy: "Sophea Chan",
+        category: "Work Permit & Visas"
+      },
+      {
+        id: "DOC-1004",
+        employeeId: "EHR-1005",
         employeeName: "Darith Sok",
         docType: "NSSF Card",
         fileName: "Darith_Sok_NSSF_Card.pdf",
@@ -674,8 +866,8 @@ function getInitialData() {
         category: "Identification"
       },
       {
-        id: "DOC-1002",
-        employeeId: "EHR-1003",
+        id: "DOC-1005",
+        employeeId: "EHR-1005",
         employeeName: "Darith Sok",
         docType: "National ID / Passport",
         fileName: "Darith_Sok_National_ID.pdf",
@@ -686,20 +878,8 @@ function getInitialData() {
         category: "Identification"
       },
       {
-        id: "DOC-1003",
-        employeeId: "EHR-1003",
-        employeeName: "Darith Sok",
-        docType: "Employment Contract",
-        fileName: "Employment_Contract_Darith_Sok.pdf",
-        fileSize: "3.1 MB",
-        uploadedAt: "2023-05-16",
-        status: "Verified",
-        verifiedBy: "Sophea Chan",
-        category: "Legal"
-      },
-      {
-        id: "DOC-1004",
-        employeeId: "EHR-1004",
+        id: "DOC-1006",
+        employeeId: "EHR-1006",
         employeeName: "Bopha Chea",
         docType: "CV / Resume",
         fileName: "Bopha_Chea_Senior_UIUX_CV.pdf",
@@ -710,8 +890,8 @@ function getInitialData() {
         category: "Career"
       },
       {
-        id: "DOC-1005",
-        employeeId: "EHR-1008",
+        id: "DOC-1007",
+        employeeId: "EHR-1010",
         employeeName: "Thida Pich",
         docType: "NSSF Card",
         fileName: "Thida_Pich_NSSF_Submission.pdf",
@@ -802,7 +982,7 @@ app.get('/api/employees', (req, res) => {
   const db = readDB();
   let list = db.employees;
 
-  const { search, department, status, role } = req.query;
+  const { search, department, status, role, origin } = req.query;
   if (search) {
     const q = search.toLowerCase();
     list = list.filter(e => 
@@ -810,7 +990,9 @@ app.get('/api/employees', (req, res) => {
       e.firstName.toLowerCase().includes(q) ||
       e.lastName.toLowerCase().includes(q) ||
       e.position.toLowerCase().includes(q) ||
-      e.email.toLowerCase().includes(q)
+      e.email.toLowerCase().includes(q) ||
+      (e.nationality && e.nationality.toLowerCase().includes(q)) ||
+      (e.workPermitNumber && e.workPermitNumber.toLowerCase().includes(q))
     );
   }
   if (department && department !== 'All') {
@@ -822,6 +1004,21 @@ app.get('/api/employees', (req, res) => {
   if (role && role !== 'All') {
     list = list.filter(e => e.role === role);
   }
+  if (origin && origin !== 'All') {
+    if (origin === 'Cambodian') {
+      list = list.filter(e => !e.isForeignWorker);
+    } else if (origin === 'Foreign') {
+      list = list.filter(e => e.isForeignWorker);
+    } else if (origin === 'ExpiringPermits') {
+      list = list.filter(e => e.isForeignWorker && (e.workPermitStatus === 'Expiring Soon' || e.workPermitStatus === 'Expired'));
+    }
+  }
+
+  // Recalculate dynamic work permit status on the fly
+  list = list.map(e => ({
+    ...e,
+    workPermitStatus: calculateWorkPermitStatus(e)
+  }));
 
   res.json(list);
 });
@@ -830,6 +1027,7 @@ app.get('/api/employees/:id', (req, res) => {
   const db = readDB();
   const emp = db.employees.find(e => e.id === req.params.id);
   if (!emp) return res.status(404).json({ error: 'Employee not found' });
+  emp.workPermitStatus = calculateWorkPermitStatus(emp);
   res.json(emp);
 });
 
@@ -839,6 +1037,8 @@ app.post('/api/employees', (req, res) => {
   
   const newNum = 1000 + db.employees.length + 1;
   const newId = body.id || `EHR-${newNum}`;
+
+  const isForeign = Boolean(body.isForeignWorker || (body.nationality && body.nationality.toLowerCase() !== 'cambodian'));
 
   const newEmp = {
     id: newId,
@@ -859,11 +1059,23 @@ app.post('/api/employees', (req, res) => {
     currency: body.currency || 'USD',
     password: body.password || 'password123',
     nssfNumber: body.nssfNumber || `NSSF-${Math.floor(10000000 + Math.random() * 90000000)}`,
-
     nationalId: body.nationalId || `${Math.floor(100000000 + Math.random() * 900000000)}`,
     address: body.address || 'Phnom Penh, Cambodia',
     bankName: body.bankName || 'ABA Bank',
     bankAccountNumber: body.bankAccountNumber || '00' + Math.floor(1000000 + Math.random() * 9000000),
+    avatar: body.avatar || '',
+    
+    // Foreign Worker & Work Permit
+    nationality: body.nationality || 'Cambodian',
+    isForeignWorker: isForeign,
+    passportNumber: body.passportNumber || '',
+    passportExpiryDate: body.passportExpiryDate || '',
+    visaType: body.visaType || (isForeign ? 'EB Business Visa (1-Year)' : ''),
+    visaExpiryDate: body.visaExpiryDate || '',
+    workPermitNumber: body.workPermitNumber || '',
+    workPermitIssueDate: body.workPermitIssueDate || '',
+    workPermitExpiryDate: body.workPermitExpiryDate || '',
+
     emergencyContact: body.emergencyContact || {
       name: 'Primary Contact',
       relationship: 'Family',
@@ -871,12 +1083,16 @@ app.post('/api/employees', (req, res) => {
     },
     leaveBalance: {
       annual: { total: 18, used: 0, remaining: 18 },
+      special: { total: 7, used: 0, remaining: 7 }, // Cambodia Labour Law Art. 169 & Prakas 267
+      casual: { total: 7, used: 0, remaining: 7 },
       sick: { total: 10, used: 0, remaining: 10 },
-      casual: { total: 5, used: 0, remaining: 5 },
       maternity: { total: body.gender === 'Female' ? 90 : 0, used: 0, remaining: body.gender === 'Female' ? 90 : 0 },
+      paternity: { total: body.gender === 'Male' ? 3 : 0, used: 0, remaining: body.gender === 'Male' ? 3 : 0 },
       unpaid: { total: 0, used: 0, remaining: 0 }
     }
   };
+
+  newEmp.workPermitStatus = calculateWorkPermitStatus(newEmp);
 
   db.employees.unshift(newEmp);
   writeDB(db);
@@ -888,7 +1104,13 @@ app.put('/api/employees/:id', (req, res) => {
   const index = db.employees.findIndex(e => e.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: 'Employee not found' });
 
-  db.employees[index] = { ...db.employees[index], ...req.body, id: req.params.id };
+  const updated = { ...db.employees[index], ...req.body, id: req.params.id };
+  if (updated.nationality && updated.nationality.toLowerCase() !== 'cambodian') {
+    updated.isForeignWorker = true;
+  }
+  updated.workPermitStatus = calculateWorkPermitStatus(updated);
+
+  db.employees[index] = updated;
   writeDB(db);
   res.json(db.employees[index]);
 });
@@ -915,7 +1137,7 @@ app.delete('/api/employees/:id', (req, res) => {
 });
 
 
-// --- LEAVE MANAGEMENT ---
+// --- LEAVE MANAGEMENT (Cambodia Labour Law statutory categories) ---
 app.get('/api/leaves', (req, res) => {
   const db = readDB();
   let list = db.leaves;
@@ -937,12 +1159,19 @@ app.post('/api/leaves', (req, res) => {
   const emp = db.employees.find(e => e.id === body.employeeId);
   if (!emp) return res.status(400).json({ error: 'Employee not found' });
 
-  // Determine key for leave balance (annual, sick, casual, maternity, unpaid)
+  // Map Cambodia leave categories:
+  // - Annual Leave -> annual
+  // - Special Leave (Family Events), Casual Leave, Marriage Leave, Bereavement Leave -> special / casual
+  // - Sick Leave -> sick
+  // - Maternity Leave -> maternity
+  // - Paternity Leave -> paternity / special
+  // - Unpaid Leave -> unpaid
   let balanceKey = 'annual';
   const lt = (body.leaveType || '').toLowerCase();
   if (lt.includes('sick')) balanceKey = 'sick';
-  else if (lt.includes('casual')) balanceKey = 'casual';
+  else if (lt.includes('special') || lt.includes('casual') || lt.includes('marriage') || lt.includes('bereavement')) balanceKey = emp.leaveBalance?.special ? 'special' : 'casual';
   else if (lt.includes('maternity')) balanceKey = 'maternity';
+  else if (lt.includes('paternity')) balanceKey = emp.leaveBalance?.paternity ? 'paternity' : (emp.leaveBalance?.special ? 'special' : 'casual');
   else if (lt.includes('unpaid')) balanceKey = 'unpaid';
 
   const daysRequested = Number(body.totalDays) || 1;
@@ -997,8 +1226,9 @@ app.put('/api/leaves/:id/status', (req, res) => {
       let balanceKey = 'annual';
       const lt = (leave.leaveType || '').toLowerCase();
       if (lt.includes('sick')) balanceKey = 'sick';
-      else if (lt.includes('casual')) balanceKey = 'casual';
+      else if (lt.includes('special') || lt.includes('casual') || lt.includes('marriage') || lt.includes('bereavement')) balanceKey = emp.leaveBalance?.special ? 'special' : 'casual';
       else if (lt.includes('maternity')) balanceKey = 'maternity';
+      else if (lt.includes('paternity')) balanceKey = emp.leaveBalance?.paternity ? 'paternity' : (emp.leaveBalance?.special ? 'special' : 'casual');
       else if (lt.includes('unpaid')) balanceKey = 'unpaid';
 
       if (emp.leaveBalance[balanceKey]) {

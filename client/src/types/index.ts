@@ -15,10 +15,16 @@ export interface LeaveBalanceCategory {
 export interface LeaveBalance {
   annual: LeaveBalanceCategory;
   sick: LeaveBalanceCategory;
-  casual: LeaveBalanceCategory;
-  maternity: LeaveBalanceCategory;
+  special: LeaveBalanceCategory; // Cambodia Labour Law Art. 169 & Prakas 267 (Special / Family Event Leave, up to 7 days/yr)
+  casual?: LeaveBalanceCategory; // backward compatibility
+  maternity: LeaveBalanceCategory; // 90 days for female employees (Art. 182)
+  paternity?: LeaveBalanceCategory; // 3-7 days
+  marriage?: LeaveBalanceCategory; // 3 days
+  bereavement?: LeaveBalanceCategory; // 3 days
   unpaid: LeaveBalanceCategory;
 }
+
+export type WorkPermitStatus = 'Valid' | 'Expiring Soon' | 'Expired' | 'Pending Renewal' | 'Not Applicable';
 
 export interface Employee {
   id: string;
@@ -42,18 +48,43 @@ export interface Employee {
   address: string;
   password?: string;
   bankName: string;
-
   bankAccountNumber: string;
   emergencyContact: EmergencyContact;
   leaveBalance: LeaveBalance;
+
+  // Portrait Photo
+  avatar?: string; // Data URL or Image URL
+
+  // Foreign Worker & Work Permit Compliance (Cambodia MoLVT / FWCMS Standard)
+  nationality?: string;
+  isForeignWorker?: boolean;
+  passportNumber?: string;
+  passportExpiryDate?: string;
+  visaType?: string; // e.g. "EB Business Visa", "K Visa", "Ordinary"
+  visaExpiryDate?: string;
+  workPermitNumber?: string; // MoLVT / FWCMS Work Permit Card ID
+  workPermitIssueDate?: string;
+  workPermitExpiryDate?: string;
+  workPermitStatus?: WorkPermitStatus;
 }
+
+export type CambodiaLeaveType =
+  | 'Annual Leave'
+  | 'Special Leave (Family Events)'
+  | 'Sick Leave'
+  | 'Maternity Leave'
+  | 'Paternity Leave'
+  | 'Marriage Leave'
+  | 'Bereavement Leave'
+  | 'Unpaid Leave'
+  | 'Casual Leave';
 
 export interface LeaveRequest {
   id: string;
   employeeId: string;
   employeeName: string;
   department: string;
-  leaveType: 'Annual Leave' | 'Sick Leave' | 'Casual Leave' | 'Maternity Leave' | 'Unpaid Leave';
+  leaveType: CambodiaLeaveType;
   startDate: string;
   endDate: string;
   totalDays: number;
@@ -118,13 +149,21 @@ export interface DocumentItem {
   id: string;
   employeeId: string;
   employeeName: string;
-  docType: 'NSSF Card' | 'National ID / Passport' | 'Employment Contract' | 'CV / Resume' | 'Certificate' | 'Other Document';
+  docType: 
+    | 'NSSF Card' 
+    | 'National ID / Passport' 
+    | 'Foreign Work Permit (MoLVT / FWCMS)'
+    | 'Passport & EB Visa'
+    | 'Employment Contract' 
+    | 'CV / Resume' 
+    | 'Certificate' 
+    | 'Other Document';
   fileName: string;
   fileSize: string;
   uploadedAt: string;
   status: 'Verified' | 'Pending Verification' | 'Rejected';
   verifiedBy: string | null;
-  category: 'Identification' | 'Legal' | 'Career' | 'General';
+  category: 'Identification' | 'Work Permit & Visas' | 'Legal' | 'Career' | 'General';
 }
 
 export interface DashboardStats {

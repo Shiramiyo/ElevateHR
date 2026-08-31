@@ -46,7 +46,13 @@ export const exportService = {
       'Email': e.email,
       'Phone': e.phone,
       'Gender': e.gender,
-      'Date of Birth': e.dateOfBirth,
+      'Nationality': e.nationality || 'Cambodian',
+      'Foreign Worker': e.isForeignWorker ? 'Yes' : 'No',
+      'Work Permit Number': e.workPermitNumber || 'N/A',
+      'Work Permit Expiry': e.workPermitExpiryDate || 'N/A',
+      'Work Permit Status': e.workPermitStatus || 'Not Applicable',
+      'Passport Number': e.passportNumber || 'N/A',
+      'Visa Type': e.visaType || 'N/A',
       'Position': e.position,
       'Department': e.department,
       'Role': e.role,
@@ -63,8 +69,10 @@ export const exportService = {
       'Bank Account': e.bankAccountNumber,
       'Emergency Contact Name': e.emergencyContact?.name,
       'Emergency Contact Phone': e.emergencyContact?.phone,
-      'Annual Leave Remaining': e.leaveBalance?.annual?.remaining,
-      'Sick Leave Remaining': e.leaveBalance?.sick?.remaining
+      'Annual Leave (Days Left)': e.leaveBalance?.annual?.remaining,
+      'Special Leave (Days Left)': e.leaveBalance?.special?.remaining ?? e.leaveBalance?.casual?.remaining,
+      'Sick Leave (Days Left)': e.leaveBalance?.sick?.remaining,
+      'Maternity Leave (Days Left)': e.leaveBalance?.maternity?.remaining
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(rows);

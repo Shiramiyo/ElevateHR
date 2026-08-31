@@ -113,12 +113,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
             onClick={() => setShowRoleMenu(!showRoleMenu)}
             className="flex items-center space-x-2 p-1.5 sm:pr-3 rounded-xl border border-slate-200 hover:bg-slate-50 transition-all text-left"
           >
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
-              {currentUser ? currentUser.firstName[0] : 'U'}
-            </div>
+            {currentUser?.avatar ? (
+              <img
+                src={currentUser.avatar}
+                alt={currentUser.firstName}
+                className="w-8 h-8 rounded-lg object-cover border border-slate-200 shadow-2xs"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                {currentUser ? currentUser.firstName[0] : 'U'}
+              </div>
+            )}
             <div className="hidden md:block leading-tight">
-              <div className="text-xs font-bold text-slate-900">
-                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Select User'}
+              <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                <span>{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Select User'}</span>
+                {currentUser?.isForeignWorker && (
+                  <span className="text-[9px] px-1 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200 font-bold">
+                    Expat
+                  </span>
+                )}
               </div>
               <div className="text-[10px] text-slate-500 capitalize">
                 {role} • {currentUser?.department || 'Operations'}

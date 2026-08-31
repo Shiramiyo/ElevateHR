@@ -145,14 +145,33 @@ export const EmployeePortal: React.FC = () => {
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            {currentUser.firstName[0]}
-            {currentUser.lastName[0]}
-          </div>
+          {currentUser.avatar ? (
+            <img
+              src={currentUser.avatar}
+              alt={`${currentUser.firstName} ${currentUser.lastName}`}
+              className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg shadow-emerald-500/20"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-emerald-500 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              {currentUser.firstName[0]}
+              {currentUser.lastName[0]}
+            </div>
+          )}
           <div>
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Employee Self-Service Portal
-            </span>
+            <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Employee Self-Service Portal
+              </span>
+              {currentUser.isForeignWorker ? (
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                  🌐 Foreign Worker ({currentUser.nationality})
+                </span>
+              ) : (
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  🇰🇭 Cambodian National
+                </span>
+              )}
+            </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-1">
               Welcome back, {currentUser.firstName}!
             </h1>
@@ -184,12 +203,46 @@ export const EmployeePortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Leave Balances Strip */}
+      {/* Foreign Worker Compliance Alert Banner if applicable */}
+      {currentUser.isForeignWorker && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-blue-900">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-blue-100 text-blue-700 rounded-xl">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-bold text-sm text-blue-950 flex items-center gap-2">
+                <span>Cambodia MoLVT Foreign Work Permit Card</span>
+                {currentUser.workPermitStatus === 'Valid' && (
+                  <span className="text-[10px] px-2 py-0.2 bg-emerald-100 text-emerald-800 rounded font-bold">
+                    FWCMS Active
+                  </span>
+                )}
+                {currentUser.workPermitStatus === 'Expiring Soon' && (
+                  <span className="text-[10px] px-2 py-0.2 bg-amber-100 text-amber-900 rounded font-bold animate-pulse">
+                    Expiring Soon
+                  </span>
+                )}
+              </div>
+              <p className="text-slate-600 text-[11px] mt-0.5">
+                Card ID: <strong className="font-mono">{currentUser.workPermitNumber || 'FWCMS-PENDING'}</strong> &nbsp;|&nbsp;
+                Expires: <strong>{currentUser.workPermitExpiryDate || 'N/A'}</strong> &nbsp;|&nbsp;
+                Visa: <strong>{currentUser.visaType || 'EB Business'}</strong> (Exp: {currentUser.visaExpiryDate || 'N/A'})
+              </p>
+            </div>
+          </div>
+          <span className="text-[11px] text-blue-700 font-semibold px-2.5 py-1 bg-white rounded-lg border border-blue-200 shadow-2xs">
+            Cambodia Labour Law Arts. 261-265
+          </span>
+        </div>
+      )}
+
+      {/* Leave Balances Strip (Cambodia Statutory Leaves) */}
       <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-bold text-slate-900">My Leave Quotas & Balances</h3>
-            <p className="text-xs text-slate-500">Statutory entitlements for the 2026 calendar year</p>
+            <h3 className="text-base font-bold text-slate-900">My Statutory Leave Quotas & Balances</h3>
+            <p className="text-xs text-slate-500">Regulated by Cambodia Labour Law (Articles 166-171, Prakas 267)</p>
           </div>
           <button
             onClick={() => setIsApplyModalOpen(true)}
@@ -202,7 +255,7 @@ export const EmployeePortal: React.FC = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-100">
-            <div className="text-xs font-semibold text-emerald-800">Annual Leave</div>
+            <div className="text-xs font-semibold text-emerald-800">Annual Leave (Art. 166)</div>
             <div className="text-2xl font-extrabold text-emerald-600 mt-1">
               {currentUser.leaveBalance?.annual?.remaining || 15} <span className="text-xs font-medium text-emerald-700">days left</span>
             </div>
@@ -211,8 +264,18 @@ export const EmployeePortal: React.FC = () => {
             </div>
           </div>
 
+          <div className="p-3.5 rounded-xl bg-purple-50/50 border border-purple-100">
+            <div className="text-xs font-semibold text-purple-800">Special Leave (Prakas 267)</div>
+            <div className="text-2xl font-extrabold text-purple-600 mt-1">
+              {currentUser.leaveBalance?.special?.remaining ?? currentUser.leaveBalance?.casual?.remaining ?? 6} <span className="text-xs font-medium text-purple-700">days left</span>
+            </div>
+            <div className="text-[11px] text-purple-700/80 mt-0.5">
+              7 days/yr family events (marriage, birth, bereavement)
+            </div>
+          </div>
+
           <div className="p-3.5 rounded-xl bg-blue-50/50 border border-blue-100">
-            <div className="text-xs font-semibold text-blue-800">Sick Leave</div>
+            <div className="text-xs font-semibold text-blue-800">Sick Leave (Prakas 084)</div>
             <div className="text-2xl font-extrabold text-blue-600 mt-1">
               {currentUser.leaveBalance?.sick?.remaining || 9} <span className="text-xs font-medium text-blue-700">days left</span>
             </div>
@@ -221,23 +284,17 @@ export const EmployeePortal: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-purple-50/50 border border-purple-100">
-            <div className="text-xs font-semibold text-purple-800">Casual Leave</div>
-            <div className="text-2xl font-extrabold text-purple-600 mt-1">
-              {currentUser.leaveBalance?.casual?.remaining || 5} <span className="text-xs font-medium text-purple-700">days left</span>
-            </div>
-            <div className="text-[11px] text-purple-700/80 mt-0.5">
-              {currentUser.leaveBalance?.casual?.used || 0} taken of {currentUser.leaveBalance?.casual?.total || 5} days
-            </div>
-          </div>
-
           <div className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-100">
-            <div className="text-xs font-semibold text-amber-800">Base Compensation</div>
+            <div className="text-xs font-semibold text-amber-800">
+              {currentUser.gender === 'Female' ? 'Maternity Leave (Art. 182)' : 'Paternity Leave'}
+            </div>
             <div className="text-2xl font-extrabold text-amber-600 mt-1">
-              ${currentUser.baseSalary.toLocaleString()}
+              {currentUser.gender === 'Female'
+                ? `${currentUser.leaveBalance?.maternity?.remaining || 90} days`
+                : `${currentUser.leaveBalance?.paternity?.remaining || 3} days`}
             </div>
             <div className="text-[11px] text-amber-700/80 mt-0.5">
-              Paid monthly via {currentUser.bankName}
+              {currentUser.gender === 'Female' ? '90 calendar days' : '3 days special leave'}
             </div>
           </div>
         </div>
@@ -382,16 +439,23 @@ export const EmployeePortal: React.FC = () => {
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Leave Type *</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Leave Type (Cambodia Labour Law) *</label>
             <select
               value={leaveData.leaveType}
               onChange={e => setLeaveData({ ...leaveData, leaveType: e.target.value })}
-              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none"
+              className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none font-semibold text-slate-800"
             >
-              <option value="Annual Leave">Annual Leave ({currentUser.leaveBalance?.annual?.remaining || 15} days remaining)</option>
-              <option value="Sick Leave">Sick Leave ({currentUser.leaveBalance?.sick?.remaining || 9} days remaining)</option>
-              <option value="Casual Leave">Casual Leave ({currentUser.leaveBalance?.casual?.remaining || 5} days remaining)</option>
-              {currentUser.gender === 'Female' && <option value="Maternity Leave">Maternity Leave (90 days)</option>}
+              <option value="Annual Leave">Annual Leave (Art. 166: {currentUser.leaveBalance?.annual?.remaining || 15} days remaining)</option>
+              <option value="Special Leave (Family Events)">Special Leave (Prakas 267: {currentUser.leaveBalance?.special?.remaining ?? currentUser.leaveBalance?.casual?.remaining ?? 6} days remaining)</option>
+              <option value="Sick Leave">Sick Leave (Prakas 084: {currentUser.leaveBalance?.sick?.remaining || 9} days remaining)</option>
+              {currentUser.gender === 'Female' && (
+                <option value="Maternity Leave">Maternity Leave (Art. 182: 90 calendar days)</option>
+              )}
+              {currentUser.gender === 'Male' && (
+                <option value="Paternity Leave">Paternity Leave (3 days special leave)</option>
+              )}
+              <option value="Marriage Leave">Marriage Leave (3 days special leave)</option>
+              <option value="Bereavement Leave">Bereavement Leave (3 days special leave)</option>
               <option value="Unpaid Leave">Unpaid Leave</option>
             </select>
           </div>
