@@ -1082,22 +1082,23 @@ export const Employees: React.FC = () => {
                   </h3>
                   <Badge status={activeEmployee.status} />
                   {activeEmployee.isForeignWorker ? (
-                    <span className="text-xs px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full font-bold border border-blue-200">
-                      🌐 Foreign Worker ({activeEmployee.nationality})
+                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-800 rounded-md font-medium border border-blue-200">
+                      Foreign Worker ({activeEmployee.nationality})
                     </span>
                   ) : (
-                    <span className="text-xs px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold border border-emerald-200">
-                      🇰🇭 Cambodian National
+                    <span className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-md font-medium border border-emerald-200">
+                      Cambodian National
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-slate-600 font-medium mt-0.5">{activeEmployee.position} • {activeEmployee.department}</p>
-                <p className="text-xs text-slate-400 mt-1 flex items-center gap-3">
-                  <span>✉ {activeEmployee.email}</span>
-                  <span>📞 {activeEmployee.phone}</span>
+                <p className="text-xs text-slate-500 mt-1 flex items-center gap-4">
+                  <span>{activeEmployee.email}</span>
+                  <span>{activeEmployee.phone}</span>
                 </p>
               </div>
             </div>
+
 
             {/* Profile Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">

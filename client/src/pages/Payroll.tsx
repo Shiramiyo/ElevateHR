@@ -13,8 +13,8 @@ import {
   ArrowRight,
   TrendingUp
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { Badge } from '../components/Badge';
+
 import { Modal } from '../components/Modal';
 import { PayrollRun, PayrollItem } from '../types';
 import { api } from '../services/api';
@@ -72,13 +72,8 @@ export const Payroll: React.FC = () => {
       const finalized = await api.finalizePayroll(currentRun);
       setCurrentRun(finalized);
       fetchPayrollHistory();
-      // Celebrate with confetti
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
     } catch (err) {
+
       console.error('Failed to finalize payroll:', err);
     } finally {
       setFinalizing(false);

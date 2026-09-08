@@ -76,11 +76,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
         )}
 
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-semibold px-2 py-1 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 truncate max-w-[150px] sm:max-w-none">
-            🏢 ElevateHR Demo
-          </span>
-          <span className="text-xs text-slate-400 hidden lg:inline">
-            System: <strong>Monday, Aug 24, 2026</strong>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
+            ElevateHR Platform
           </span>
         </div>
       </div>
@@ -148,11 +145,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
 
           {showRoleMenu && (
             <div
-              className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 animate-in fade-in zoom-in-95 duration-100"
+              className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50"
             >
-              <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <span>Switch User / Persona</span>
-                <span className="text-[10px] font-mono text-slate-400">{employeesList.length || 6} Profiles</span>
+              <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                <span>Switch Account</span>
+                <span className="text-[11px] font-mono text-slate-400">{employeesList.length || 6} Profiles</span>
               </div>
 
               <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
@@ -165,9 +162,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
                         setShowRoleMenu(false);
                       }}
                       className={`w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors ${
-                        currentUser?.id === emp.id ? 'bg-emerald-50/70 font-bold text-emerald-950' : 'text-slate-700'
+                        currentUser?.id === emp.id ? 'bg-slate-100 font-semibold text-slate-900' : 'text-slate-700'
                       }`}
                     >
+
                       <div className="flex items-center space-x-2.5">
                         {emp.avatar ? (
                           <img
