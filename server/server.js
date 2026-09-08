@@ -1,15 +1,91 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// 1. Security Headers via Helmet (disables X-Powered-By, sets X-Frame-Options, X-Content-Type-Options, HSTS)
+app.use(helmet({
+  contentSecurityPolicy: false, // Ensures Google Fonts and Vite SPA bundles load seamlessly
+  crossOriginEmbedderPolicy: false
+}));
+
+// 2. CORS Policy: Whitelist only trusted origins (local development + production Render domain)
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'https://elevatehr-st61.onrender.com'
+];
+if (process.env.ALLOWED_ORIGIN) {
+  allowedOrigins.push(process.env.ALLOWED_ORIGIN);
+}
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Blocked by CORS policy'));
+    }
+  },
+  credentials: true
+}));
+
+// 3. Rate Limiting: Defend against DoS and automated spam
+// General API limiter: 300 requests per 15 minutes per IP
+const generalApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests from this IP. Please try again in 15 minutes.' }
+});
+
+// Sensitive action limiter: 30 requests per 15 minutes per IP
+const sensitiveActionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please try again in 15 minutes.' }
+});
+
+app.use('/api', generalApiLimiter);
+app.use('/api/auth/login', sensitiveActionLimiter);
+
 app.use(express.json({ limit: '10mb' }));
 
+// 4. Input sanitization helper (strips HTML/script tags to prevent stored XSS)
+function sanitizeString(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/<[^>]*>?/gm, '').trim();
+}
+
+function sanitizeObject(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  for (const key of Object.keys(obj)) {
+    if (typeof obj[key] === 'string') {
+      obj[key] = sanitizeString(obj[key]);
+    } else if (typeof obj[key] === 'object') {
+      sanitizeObject(obj[key]);
+    }
+  }
+  return obj;
+}
+
+// 5. Sensitive data stripping helper (prevents passwords leaking in employee listings)
+function stripSensitiveEmployee(emp) {
+  if (!emp) return emp;
+  const { password, ...safeEmp } = emp;
+  return safeEmp;
+}
+
 const DATA_FILE = path.join(__dirname, 'data', 'database.json');
+
 
 // Helper to calculate Work Permit status based on expiry date
 function calculateWorkPermitStatus(emp) {
@@ -1020,7 +1096,7 @@ app.get('/api/employees', (req, res) => {
     workPermitStatus: calculateWorkPermitStatus(e)
   }));
 
-  res.json(list);
+  res.json(list.map(stripSensitiveEmployee));
 });
 
 app.get('/api/employees/:id', (req, res) => {
@@ -1028,12 +1104,13 @@ app.get('/api/employees/:id', (req, res) => {
   const emp = db.employees.find(e => e.id === req.params.id);
   if (!emp) return res.status(404).json({ error: 'Employee not found' });
   emp.workPermitStatus = calculateWorkPermitStatus(emp);
-  res.json(emp);
+  res.json(stripSensitiveEmployee(emp));
 });
 
 app.post('/api/employees', (req, res) => {
   const db = readDB();
-  const body = req.body;
+  const body = sanitizeObject(req.body);
+
   
   const newNum = 1000 + db.employees.length + 1;
   const newId = body.id || `EHR-${newNum}`;
@@ -1154,9 +1231,10 @@ app.get('/api/leaves', (req, res) => {
 
 app.post('/api/leaves', (req, res) => {
   const db = readDB();
-  const body = req.body;
+  const body = sanitizeObject(req.body);
 
   const emp = db.employees.find(e => e.id === body.employeeId);
+
   if (!emp) return res.status(400).json({ error: 'Employee not found' });
 
   // Map Cambodia leave categories:
