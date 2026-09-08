@@ -51,17 +51,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarContent = (
     <div className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none h-full">
       {/* Brand Header */}
-      <div className="h-16 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-emerald-500/20">
+      <div className="h-16 px-6 flex items-center justify-between border-b border-slate-800 bg-slate-950">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-xs">
             E
           </div>
           <div>
-            <span className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1">
-              Elevate<span className="text-emerald-400">HR</span>
+            <span className="font-bold text-base tracking-tight text-white">
+              Elevate<span className="text-slate-300">HR</span>
             </span>
             <span className="block text-[10px] text-slate-400 font-medium tracking-wide uppercase">
-              Operations Cloud
+              Management Platform
             </span>
           </div>
         </div>
@@ -76,23 +76,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Role Badge Indicator */}
-      <div className="px-4 py-3 bg-slate-800/40 border-b border-slate-800/60 flex items-center justify-between">
-        <span className="text-xs text-slate-400">Active Mode:</span>
-        <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider ${
-          role === 'admin' 
-            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
-            : role === 'manager' 
-            ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' 
-            : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-        }`}>
-          {role}
+      <div className="px-5 py-3 bg-slate-950 border-b border-slate-800/80 flex items-center justify-between">
+        <span className="text-xs text-slate-400">Viewing As:</span>
+        <span className="text-xs px-2.5 py-0.5 rounded-md font-medium capitalize bg-slate-800 text-slate-200 border border-slate-700">
+          {role === 'admin' ? 'HR Administrator' : role}
         </span>
       </div>
 
       {/* Navigation Links */}
       <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        <div className="px-3 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-          {role === 'employee' ? 'Self-Service Space' : 'Management & Core'}
+        <div className="px-3 pb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          {role === 'employee' ? 'Self-Service' : 'Workspace'}
         </div>
 
         {visibleItems.map(item => {
@@ -103,21 +97,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                 isActive
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/30 font-semibold'
-                  : item.highlight
-                  ? 'text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/40 hover:text-emerald-200 border border-emerald-800/40'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                  ? 'bg-blue-600 text-white font-semibold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <div className="flex items-center space-x-3">
-                <Icon className={`w-5 h-5 ${isActive ? 'text-white' : item.highlight ? 'text-emerald-400' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                 <span>{item.label}</span>
               </div>
               {item.badge !== undefined && (
-                <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${
-                  isActive ? 'bg-white text-emerald-700' : 'bg-amber-500 text-slate-950'
+                <span className={`px-2 py-0.2 rounded text-xs font-semibold ${
+                  isActive ? 'bg-white text-blue-700' : 'bg-amber-500 text-slate-950'
                 }`}>
                   {item.badge}
                 </span>
@@ -127,18 +119,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </div>
 
-      {/* Cloud Security & Footer Info */}
-      <div className="p-4 border-t border-slate-800/80 bg-slate-950/30 space-y-2">
-        <div className="flex items-center space-x-2 text-xs text-slate-400">
-          <ShieldAlert className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>AES-256 Cloud Encrypted</span>
-        </div>
-        <div className="text-[11px] text-slate-500">
-          ElevateHR v1.0 • Mobile & Cloud Ready
-        </div>
+      {/* Footer Info */}
+      <div className="p-4 border-t border-slate-800 bg-slate-950 text-xs text-slate-500">
+        <div>ElevateHR System</div>
+        <div className="text-[11px] text-slate-500 mt-0.5">Version 1.2</div>
       </div>
     </div>
   );
+
 
   return (
     <>

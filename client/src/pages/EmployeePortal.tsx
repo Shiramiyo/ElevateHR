@@ -199,80 +199,81 @@ export const EmployeePortal: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center space-x-4">
           <div className="relative group cursor-pointer" onClick={handleOpenAvatarModal} title="Click to Change Portrait Photo">
             {currentUser.avatar ? (
               <img
                 src={currentUser.avatar}
                 alt={`${currentUser.firstName} ${currentUser.lastName}`}
-                className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg shadow-emerald-500/20 group-hover:brightness-75 transition-all"
+                className="w-16 h-16 rounded-xl object-cover border border-slate-200 group-hover:brightness-90 transition-all"
               />
             ) : (
-              <div className="w-16 h-16 rounded-2xl bg-emerald-500 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:brightness-75 transition-all">
+              <div className="w-16 h-16 rounded-xl bg-slate-800 text-white font-bold text-xl flex items-center justify-center group-hover:bg-slate-700 transition-all">
                 {currentUser.firstName[0]}
                 {currentUser.lastName[0]}
               </div>
             )}
-            <div className="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 rounded-xl bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="w-5 h-5 text-white drop-shadow" />
             </div>
           </div>
           <div>
             <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                Employee Self-Service Portal
+              <span className="text-xs font-medium px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                Employee Self-Service
               </span>
               {currentUser.isForeignWorker ? (
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  🌐 Foreign Worker ({currentUser.nationality})
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                  Foreign Worker ({currentUser.nationality})
                 </span>
               ) : (
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  🇰🇭 Cambodian National
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  Cambodian National
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3 mt-1 flex-wrap">
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-                Welcome back, {currentUser.firstName}!
+            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900">
+                Welcome back, {currentUser.firstName}
               </h1>
               <button
                 onClick={handleOpenAvatarModal}
-                className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-emerald-300 hover:text-white border border-emerald-500/30 hover:border-emerald-400 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all"
+                className="px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-600 border border-slate-300 text-xs font-medium rounded-lg flex items-center gap-1.5 transition-colors"
                 title="Change your portrait photo"
               >
                 <Camera className="w-3.5 h-3.5" />
                 <span>Change Photo</span>
               </button>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">
-              {currentUser.position} • {currentUser.department} • ID: <span className="font-mono">{currentUser.id}</span>
+            <p className="text-xs text-slate-500 mt-1">
+              {currentUser.position} • {currentUser.department} • ID: <span className="font-mono text-slate-700">{currentUser.id}</span>
             </p>
           </div>
         </div>
 
         {/* Punch Clock Widget */}
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 flex items-center space-x-4">
+        <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200 flex items-center space-x-4">
           <div>
-            <div className="text-[11px] text-slate-300 uppercase font-semibold">Today's Attendance</div>
-            <div className="text-sm font-bold text-white flex items-center gap-1.5 mt-0.5">
-              <span className={`w-2.5 h-2.5 rounded-full ${isClockedIn ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`}></span>
-              {isClockedIn ? `Clocked In at ${clockInTime || '08:00 AM'}` : 'Not Clocked In'}
+            <div className="text-[11px] text-slate-500 uppercase font-medium">Daily Attendance</div>
+            <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5 mt-0.5">
+              <span className={`w-2 h-2 rounded-full ${isClockedIn ? 'bg-emerald-600' : 'bg-slate-400'}`}></span>
+              {isClockedIn ? `Clocked In (${clockInTime || '08:00 AM'})` : 'Not Clocked In'}
             </div>
           </div>
           <button
             onClick={() => handlePunchClock(isClockedIn ? 'clock-out' : 'clock-in')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-md ${
+            className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors ${
               isClockedIn
-                ? 'bg-rose-500 hover:bg-rose-600 text-white'
-                : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
+                ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
             {isClockedIn ? 'Clock Out' : 'Clock In'}
           </button>
         </div>
       </div>
+
 
       {/* Foreign Worker Compliance Alert Banner if applicable */}
       {currentUser.isForeignWorker && (

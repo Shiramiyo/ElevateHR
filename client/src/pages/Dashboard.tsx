@@ -29,7 +29,8 @@ import { Badge } from '../components/Badge';
 import { DashboardStats, LeaveRequest } from '../types';
 import { api } from '../services/api';
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+const COLORS = ['#2563eb', '#0f766e', '#b45309', '#6366f1', '#475569', '#be185d'];
+
 
 interface DashboardProps {
   onNavigate: (tab: string) => void;
@@ -78,38 +79,38 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl p-6 md:p-7 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            ElevateHR Live Operations
-          </span>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 mb-2">
+            ElevateHR Operations
+          </div>
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900">
             Workforce & Operations Center
           </h1>
-          <p className="text-sm text-slate-300 mt-1 max-w-xl">
-            Real-time analytics for headcount distribution, pending leave authorizations, payroll projections, and employee compliance.
+          <p className="text-xs text-slate-600 mt-1 max-w-xl">
+            Real-time overview of active headcount, pending leave approvals, payroll totals, and employee records.
           </p>
         </div>
 
         {/* Action Shortcuts */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2.5">
           <button
             onClick={() => onNavigate('employees')}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-transform transform active:scale-95 shadow-md shadow-emerald-950/40"
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-xs transition-colors shadow-xs"
           >
             <UserPlus className="w-4 h-4" />
             <span>Onboard Employee</span>
           </button>
           <button
             onClick={() => onNavigate('payroll')}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl text-xs backdrop-blur-md transition-colors border border-white/10"
+            className="flex items-center space-x-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 font-medium rounded-lg text-xs border border-slate-300 transition-colors shadow-xs"
           >
             <Receipt className="w-4 h-4" />
             <span>Process Payroll</span>
           </button>
         </div>
       </div>
+
 
       {/* KPI Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -180,7 +181,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   formatter={(val: any) => [`$${Number(val).toLocaleString()}`, 'Expenditure']}
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', color: '#fff' }}
                 />
-                <Bar dataKey="amount" fill="#10b981" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="amount" fill="#2563eb" radius={[4, 4, 0, 0]} />
+
               </BarChart>
             </ResponsiveContainer>
           </div>

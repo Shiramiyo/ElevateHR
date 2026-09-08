@@ -224,9 +224,9 @@ export const Payroll: React.FC = () => {
           </div>
 
           {/* Payroll Run Status & Finalize Action Banner */}
-          <div className="bg-gradient-to-r from-emerald-900 to-slate-900 rounded-2xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+          <div className="bg-slate-900 rounded-xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">
                 <Receipt className="w-5 h-5" />
               </div>
               <div>
@@ -234,7 +234,7 @@ export const Payroll: React.FC = () => {
                   <h3 className="font-bold text-base">{currentRun.monthLabel} Payroll Run</h3>
                   <Badge status={currentRun.status} />
                 </div>
-                <p className="text-xs text-slate-300 mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   Processed by {currentRun.processedBy} on {currentRun.processedDate} • {currentRun.items.length} employee records
                 </p>
               </div>
@@ -244,18 +244,19 @@ export const Payroll: React.FC = () => {
               <button
                 onClick={handleFinalize}
                 disabled={finalizing}
-                className="flex items-center space-x-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-950/40 transition-transform transform active:scale-95"
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-lg transition-colors"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{finalizing ? 'Finalizing...' : 'Finalize & Approve Payroll Run'}</span>
               </button>
             ) : (
-              <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-800">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Finalized & Paid</span>
+              <div className="flex items-center space-x-2 text-xs font-medium text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-md border border-emerald-200">
+                <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                <span>Finalized & Disbursed</span>
               </div>
             )}
           </div>
+
 
           {/* Detailed Calculation Breakdown Table */}
           <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
