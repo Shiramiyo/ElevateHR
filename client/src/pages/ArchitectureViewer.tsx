@@ -269,179 +269,133 @@ const TEAM_MEMBERS = [
   }
 ];
 
-interface CalendarWeek {
-  index: number;
-  date: number;
-  month: string;
-  quarter: 'Q1' | 'Q2' | 'Q3' | 'Q4';
-}
-
-interface MonthGroup {
+interface TimelineTask {
   name: string;
-  quarter: 'Q1' | 'Q2' | 'Q3' | 'Q4';
-  dates: number[];
+  startCol: number; // 0 to 5
+  endCol: number; // 0 to 5
+  deliverable?: string;
 }
 
-const TEMPLATE_MONTHS: MonthGroup[] = [
-  // Q1 (13 weeks)
-  { name: 'JANUARY', quarter: 'Q1', dates: [6, 13, 20, 27] },
-  { name: 'FEBRUARY', quarter: 'Q1', dates: [3, 10, 17, 24] },
-  { name: 'MARCH', quarter: 'Q1', dates: [2, 9, 16, 23, 30] },
-  // Q2 (13 weeks)
-  { name: 'APRIL', quarter: 'Q2', dates: [6, 13, 20, 27] },
-  { name: 'MAY', quarter: 'Q2', dates: [4, 11, 18, 25] },
-  { name: 'JUNE', quarter: 'Q2', dates: [1, 8, 15, 22, 29] },
-  // Q3 (13 weeks)
-  { name: 'JULY', quarter: 'Q3', dates: [6, 13, 20, 27] },
-  { name: 'AUGUST', quarter: 'Q3', dates: [3, 10, 17, 24, 31] },
-  { name: 'SEPTEMBER', quarter: 'Q3', dates: [7, 14, 21, 28] },
-  // Q4 (13 weeks)
-  { name: 'OCTOBER', quarter: 'Q4', dates: [5, 12, 19, 26] },
-  { name: 'NOVEMBER', quarter: 'Q4', dates: [2, 9, 16, 23, 30] },
-  { name: 'DECEMBER', quarter: 'Q4', dates: [7, 14, 21, 28] }
+interface MemberTimeline {
+  name: string;
+  role: string;
+  color: string;
+  barColor: string;
+  tasks: TimelineTask[];
+}
+
+const MVP_COLUMNS = ['June W1', 'June W2', 'July W3', 'July W4', 'July W5', 'July W6'];
+
+const MVP_TIMELINE: MemberTimeline[] = [
+  {
+    name: 'Choeng Dyne',
+    role: 'Full-Stack Lead / Problem-Solving',
+    color: 'text-[#e11d48]',
+    barColor: 'bg-[#e11d48]',
+    tasks: [
+      { name: 'Requirements Gathering', startCol: 0, endCol: 0, deliverable: 'Project scope document & user persona matrix' },
+      { name: 'Market Research', startCol: 0, endCol: 1, deliverable: 'Competitive analysis of local Cambodian HRMS solutions' },
+      { name: 'Goals & Objectives', startCol: 1, endCol: 1, deliverable: 'Core MVP milestone definition & Limkokwing proposal' }
+    ]
+  },
+  {
+    name: 'Kith Annsreng',
+    role: 'Developer / Integration',
+    color: 'text-[#2563eb]',
+    barColor: 'bg-[#2563eb]',
+    tasks: [
+      { name: 'Software Requirements', startCol: 1, endCol: 3, deliverable: 'MoLVT labor compliance rules & tax bracket models' },
+      { name: 'Project Scope', startCol: 2, endCol: 3, deliverable: 'Role-based access matrix & sprint deliverables' },
+      { name: 'Technology Stack', startCol: 2, endCol: 3, deliverable: 'React + Vite, Tailwind CSS, Express REST API, SQLite' }
+    ]
+  },
+  {
+    name: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    color: 'text-[#16a34a]',
+    barColor: 'bg-[#16a34a]',
+    tasks: [
+      { name: 'System Architecture', startCol: 3, endCol: 4, deliverable: 'Multi-tier architecture & relational ERD data models' },
+      { name: 'Budget & Resources', startCol: 3, endCol: 4, deliverable: 'Cloud infrastructure cost projection & test lab plan' }
+    ]
+  },
+  {
+    name: 'Kim Menghorpisith',
+    role: 'UI/UX Designer',
+    color: 'text-[#ea580c]',
+    barColor: 'bg-[#ea580c]',
+    tasks: [
+      { name: 'Risk Management', startCol: 4, endCol: 5, deliverable: 'Contingency plan for statutory tax changes & data security' },
+      { name: 'Testing & Quality Assurance', startCol: 4, endCol: 5, deliverable: 'Payroll accuracy verification & automated test cases' },
+      { name: 'Final Defense & University Sign-off', startCol: 5, endCol: 5, deliverable: 'Live presentation, demo on Render, final proposal thesis' }
+    ]
+  }
 ];
 
-const ALL_52_WEEKS: CalendarWeek[] = TEMPLATE_MONTHS.flatMap(m =>
-  m.dates.map(date => ({
-    date,
-    month: m.name,
-    quarter: m.quarter,
-    index: 0
-  }))
-).map((w, idx) => ({ ...w, index: idx }));
-
-interface ScheduleTask {
-  code: string;
+interface FuturePhase {
+  phase: string;
   title: string;
-  assignee: 'Chhong Dyne' | 'Kith Annsreng' | 'Leng Panhaleap' | 'Kim Menghorpisith' | 'All Members';
-  start: number; // 0 to 51
-  end: number; // 0 to 51 (inclusive)
-  deliverables: string;
-}
-
-interface ScheduleProject {
-  id: string;
-  name: string;
-  subtitle: string;
-  phaseCode: string;
-  headerBg: string;
-  labelBg: string;
+  lead: string;
+  color: string;
   barColor: string;
-  parentBarColor: string;
-  parentStart: number;
-  parentEnd: number;
-  tasks: ScheduleTask[];
+  tasks: {
+    name: string;
+    startCol: number; // 0: Q1 2027, 1: Q2 2027, 2: Q3 2027, 3: Q4 2027
+    endCol: number;
+    deliverables: string;
+  }[];
 }
 
-const SCHEDULE_PROJECTS: ScheduleProject[] = [
+const FUTURE_COLUMNS = ['Q1 2027 (Pilot)', 'Q2 2027 (Multi-Branch)', 'Q3 2027 (Accounting)', 'Q4 2027 (Mobile Apps)'];
+
+const FUTURE_PHASES: FuturePhase[] = [
   {
-    id: 'P1',
-    name: 'PROJECT ONE',
-    subtitle: 'MVP Core System Stabilization',
-    phaseCode: 'Phase 1 • Q4 2026 – Q1 2027',
-    headerBg: 'bg-[#1e293b] text-white',
-    labelBg: 'bg-[#e2e8f0]',
-    barColor: 'bg-[#64748b]',
-    parentBarColor: 'bg-[#334155]',
-    parentStart: 8,
-    parentEnd: 12,
+    phase: 'Phase 2',
+    title: 'Hardware Biometrics Integration',
+    lead: 'Kith Annsreng & Choeng Dyne',
+    color: 'text-[#0284c7]',
+    barColor: 'bg-[#0284c7]',
     tasks: [
-      { code: 'Task 1', title: 'Requirements Gathering & Proposal Specification', assignee: 'Chhong Dyne', start: 8, end: 9, deliverables: 'Proposal doc, target personas, scope definition' },
-      { code: 'Task 2', title: 'UI/UX Design System & Figma Wireframes', assignee: 'Kim Menghorpisith', start: 9, end: 10, deliverables: 'Figma component library, high-contrast tokens' },
-      { code: 'Task 3', title: 'System Architecture & Relational ERD Modeling', assignee: 'Chhong Dyne', start: 9, end: 10, deliverables: '3-tier data flow diagram, schema relations' },
-      { code: 'Task 3.1', title: 'Express REST API & Database Schema Engine', assignee: 'Chhong Dyne', start: 10, end: 11, deliverables: 'JSON/SQLite database models, CRUD endpoints' },
-      { code: 'Task 3.2', title: 'React + Vite Frontend Shell & RBAC Navigation', assignee: 'Kith Annsreng', start: 10, end: 11, deliverables: '1-click role switcher, responsive sidebar' },
-      { code: 'Task 3.3', title: 'Statutory Payroll Calculation & Progressive Tax Engine', assignee: 'Chhong Dyne', start: 10, end: 11, deliverables: 'Cambodian tax brackets, 4% NSSF, deductions' },
-      { code: 'Task 4', title: 'Cambodia Labor Compliance & Render Cloud Deployment', assignee: 'Leng Panhaleap', start: 11, end: 12, deliverables: 'Production deploy on Render, QA sign-off' }
+      { name: 'Biometric Hardware Evaluation & Vendor Selection', startCol: 0, endCol: 0, deliverables: 'Optical & capacitive reader bench tests' },
+      { name: 'Fingerprint Reader SDK Driver Daemon', startCol: 0, endCol: 0, deliverables: 'Node.js USB/IP daemon driver listener' },
+      { name: 'Single-Location Flagship Branch Pilot', startCol: 0, endCol: 1, deliverables: 'Phnom Penh live anti-buddy punching pilot' }
     ]
   },
   {
-    id: 'P2',
-    name: 'PROJECT TWO',
-    subtitle: 'Hardware Biometric Integration (Pilot)',
-    phaseCode: 'Phase 2 • Q1 – Q2 2027',
-    headerBg: 'bg-[#16a34a] text-white',
-    labelBg: 'bg-[#dcfce7]',
-    barColor: 'bg-[#84cc16]',
-    parentBarColor: 'bg-[#16a34a]',
-    parentStart: 10,
-    parentEnd: 26,
+    phase: 'Phase 3',
+    title: 'Multi-Branch Cloud Biometric Rollout',
+    lead: 'Choeng Dyne & Leng Panhaleap',
+    color: 'text-[#6366f1]',
+    barColor: 'bg-[#6366f1]',
     tasks: [
-      { code: 'Task 1', title: 'Biometric Hardware Evaluation & Vendor Selection', assignee: 'Kith Annsreng', start: 12, end: 14, deliverables: 'ZKTeco/Hikvision optical & capacitive reader test' },
-      { code: 'Task 2', title: 'Fingerprint Reader SDK Driver Daemon', assignee: 'Chhong Dyne', start: 11, end: 13, deliverables: 'Node.js USB/IP daemon driver listener' },
-      { code: 'Task 3', title: 'Biometric Template Cryptographic Storage', assignee: 'Leng Panhaleap', start: 12, end: 14, deliverables: 'One-way template hashing, AES-256 vault' },
-      { code: 'Task 4', title: 'Real-Time Hardware Punch Log Listener', assignee: 'Chhong Dyne', start: 13, end: 15, deliverables: 'WebSocket push of physical clock-ins' },
-      { code: 'Task 5', title: 'Anti-Buddy Punching & Liveness Detection', assignee: 'Kith Annsreng', start: 15, end: 16, deliverables: 'Sub-second fraud prevention filter' },
-      { code: 'Task 6', title: 'Single-Location Pilot Hardware Setup', assignee: 'Kim Menghorpisith', start: 16, end: 17, deliverables: 'Phnom Penh flagship branch installation' },
-      { code: 'Task 7', title: 'Physical vs Web Attendance Calibration', assignee: 'Leng Panhaleap', start: 17, end: 19, deliverables: 'Punctuality precision validation' },
-      { code: 'Task 8', title: 'Pilot Sign-off & MoLVT Compliance Audit', assignee: 'All Members', start: 19, end: 26, deliverables: 'Section 14 Phase 2 audit approval' }
+      { name: 'Multi-Branch WireGuard Mesh Network Topology', startCol: 1, endCol: 1, deliverables: 'Secure edge-to-cloud mesh VPN' },
+      { name: 'Edge-to-Cloud Biometric Template Synchronization', startCol: 1, endCol: 1, deliverables: 'Distributed roster push to branch readers' },
+      { name: 'Offline Punch Buffering & Resilient Cloud Queue', startCol: 1, endCol: 2, deliverables: 'Local SQLite cache with auto-sync on reconnect' }
     ]
   },
   {
-    id: 'P3',
-    name: 'PROJECT THREE',
-    subtitle: 'Multi-Branch Biometric Cloud Rollout',
-    phaseCode: 'Phase 3 • Q2 – Q3 2027',
-    headerBg: 'bg-[#52525b] text-white',
-    labelBg: 'bg-[#e4e4e7]',
-    barColor: 'bg-[#94a3b8]',
-    parentBarColor: 'bg-[#52525b]',
-    parentStart: 13,
-    parentEnd: 29,
+    phase: 'Phase 4',
+    title: 'Enterprise Accounting Integration',
+    lead: 'Choeng Dyne & Kith Annsreng',
+    color: 'text-[#d97706]',
+    barColor: 'bg-[#d97706]',
     tasks: [
-      { code: 'Task 1', title: 'Multi-Branch Network Topology & Edge VPN', assignee: 'Chhong Dyne', start: 14, end: 25, deliverables: 'Secure site-to-site WireGuard edge mesh' },
-      { code: 'Task 2', title: 'Edge-to-Cloud Biometric Template Sync', assignee: 'Kith Annsreng', start: 15, end: 24, deliverables: 'Distributed roster push to branch readers' },
-      { code: 'Task 3', title: 'Offline Punch Buffering & Resilient Queue', assignee: 'Chhong Dyne', start: 16, end: 18, deliverables: 'Local SQLite cache during ISP outage' },
-      { code: 'Task 4', title: 'Multi-Tenant Branch Gateway Deployment', assignee: 'Leng Panhaleap', start: 18, end: 20, deliverables: 'Automated gateway config scripts' },
-      { code: 'Task 5', title: 'Branch Manager Attendance Live Dashboard', assignee: 'Kim Menghorpisith', start: 20, end: 29, deliverables: 'Real-time multi-branch presence view' },
-      { code: 'Task 6', title: 'WAN Disconnect Auto-Failover Testing', assignee: 'Leng Panhaleap', start: 23, end: 28, deliverables: 'Zero-data-loss stress testing' },
-      { code: 'Task 7', title: 'Cross-Branch Roaming Employee Verification', assignee: 'Kith Annsreng', start: 29, end: 29, deliverables: 'Seamless clock-in across any location' },
-      { code: 'Task 8', title: 'National Multi-Branch Rollout Complete', assignee: 'All Members', start: 30, end: 30, deliverables: 'Section 14 Phase 3 national milestone' }
+      { name: 'General Ledger Chart of Accounts Mapping', startCol: 2, endCol: 2, deliverables: 'Salary & tax journal cost center split' },
+      { name: 'QuickBooks Online & Xero OAuth2 Integration', startCol: 2, endCol: 2, deliverables: 'Automated two-way ledger sync' },
+      { name: 'Cambodia GDT E-Tax Format & ABA PayWay Disbursal', startCol: 2, endCol: 3, deliverables: 'Official tax exporter & batch payroll payouts' }
     ]
   },
   {
-    id: 'P4',
-    name: 'PROJECT FOUR',
-    subtitle: 'Enterprise Accounting & ERP Integration',
-    phaseCode: 'Phase 4 • Q2 – Q4 2027',
-    headerBg: 'bg-[#ca8a04] text-white',
-    labelBg: 'bg-[#fef3c7]',
-    barColor: 'bg-[#f59e0b]',
-    parentBarColor: 'bg-[#ca8a04]',
-    parentStart: 17,
-    parentEnd: 42,
+    phase: 'Phase 5',
+    title: 'Native Mobile Applications (iOS & Android)',
+    lead: 'Kim Menghorpisith & All Members',
+    color: 'text-[#8b5cf6]',
+    barColor: 'bg-[#8b5cf6]',
     tasks: [
-      { code: 'Task 1', title: 'Chart of Accounts & Cost Center Mapping', assignee: 'Chhong Dyne', start: 18, end: 18, deliverables: 'Departmental salary & tax ledger mapping' },
-      { code: 'Task 2', title: 'QuickBooks Online & Xero OAuth2 Engine', assignee: 'Kith Annsreng', start: 19, end: 19, deliverables: 'Certified API token handshake' },
-      { code: 'Task 3', title: 'Statutory Payroll Cost Split Engine', assignee: 'Chhong Dyne', start: 19, end: 26, deliverables: 'Gross salary, 4% NSSF, and tax journals' },
-      { code: 'Task 4', title: 'Two-Way General Ledger Journal Sync', assignee: 'Chhong Dyne', start: 24, end: 24, deliverables: 'Automated monthly debit/credit posting' },
-      { code: 'Task 5', title: 'Bank ABA PayWay / Wing Batch Disbursal', assignee: 'Kith Annsreng', start: 24, end: 24, deliverables: 'Automated batch payroll payout files' },
-      { code: 'Task 6', title: 'Automated End-of-Month Tax File Exporter', assignee: 'Leng Panhaleap', start: 24, end: 24, deliverables: 'Pre-filled GDT monthly withholding sheet' },
-      { code: 'Task 7', title: 'Cambodia GDT E-Tax Format Compliance', assignee: 'Leng Panhaleap', start: 24, end: 24, deliverables: 'Official tax authority schema validation' },
-      { code: 'Task 8', title: 'Enterprise ERP Synchronization Sign-off', assignee: 'All Members', start: 24, end: 42, deliverables: 'Section 14 Phase 4 enterprise audit' }
-    ]
-  },
-  {
-    id: 'P5',
-    name: 'PROJECT FIVE',
-    subtitle: 'Native Mobile Applications (iOS & Android)',
-    phaseCode: 'Phase 5 • Q3 – Q4 2027',
-    headerBg: 'bg-[#0284c7] text-white',
-    labelBg: 'bg-[#e0f2fe]',
-    barColor: 'bg-[#0ea5e9]',
-    parentBarColor: 'bg-[#0284c7]',
-    parentStart: 26,
-    parentEnd: 48,
-    tasks: [
-      { code: 'Task 1', title: 'React Native / Flutter Cross-Platform Architecture', assignee: 'Kim Menghorpisith', start: 26, end: 28, deliverables: 'Mobile state engine & component kit' },
-      { code: 'Task 2', title: 'Geofenced GPS Mobile Attendance Clock-In', assignee: 'Kith Annsreng', start: 28, end: 29, deliverables: 'Radius-restricted mobile punch' },
-      { code: 'Task 3', title: 'TouchID / FaceID Biometric Auth Module', assignee: 'Chhong Dyne', start: 29, end: 29, deliverables: 'Hardware biometrics keychain security' },
-      { code: 'Task 4', title: 'Push Notifications for Leave & Overtime', assignee: 'Kim Menghorpisith', start: 29, end: 29, deliverables: 'FCM / APNs instant approval notifications' },
-      { code: 'Task 5', title: 'Digital PDF Payslip Download & Storage', assignee: 'Kith Annsreng', start: 30, end: 32, deliverables: 'Offline encrypted payslip vault' },
-      { code: 'Task 6', title: 'Tamper-Proof Offline Attendance Stash', assignee: 'Leng Panhaleap', start: 31, end: 32, deliverables: 'Cryptographic signature on punch queues' },
-      { code: 'Task 7', title: 'App Store & Play Store Compliance Build', assignee: 'All Members', start: 33, end: 39, deliverables: 'Apple Developer & Google Play submission' },
-      { code: 'Task 8', title: 'Enterprise Mobile Rollout & UAT Defense', assignee: 'All Members', start: 43, end: 46, deliverables: 'End-to-end pilot feedback rollout' },
-      { code: 'Task 9', title: 'University Defense Final Presentation', assignee: 'All Members', start: 47, end: 48, deliverables: 'Project completion & graduation demo' }
+      { name: 'React Native Cross-Platform ESS Architecture', startCol: 3, endCol: 3, deliverables: 'iOS and Android self-service portals' },
+      { name: 'Geofenced GPS Mobile Attendance Clock-In', startCol: 3, endCol: 3, deliverables: 'Radius-restricted clock-in with tamper guard' },
+      { name: 'TouchID / FaceID Biometric Mobile Authentication', startCol: 3, endCol: 3, deliverables: 'Hardware biometric keychain authentication' },
+      { name: 'App Store & Google Play Store Enterprise Launch', startCol: 3, endCol: 3, deliverables: 'Production store releases & final university defense' }
     ]
   }
 ];
@@ -449,8 +403,7 @@ const SCHEDULE_PROJECTS: ScheduleProject[] = [
 export const ArchitectureViewer: React.FC = () => {
   const [activeView, setActiveView] = useState<'architecture' | 'erd' | 'scope' | 'timeline'>('timeline');
   const [selectedAssignee, setSelectedAssignee] = useState<string>('All');
-  const [labelStyle, setLabelStyle] = useState<'template' | 'detailed'>('template');
-  const [zoomScale, setZoomScale] = useState<number>(100);
+  const [timelineViewMode, setTimelineViewMode] = useState<'all' | 'mvp' | 'future'>('all');
   const [screenshotMode, setScreenshotMode] = useState<boolean>(false);
 
   return (
@@ -728,338 +681,273 @@ export const ArchitectureViewer: React.FC = () => {
             ))}
           </div>
 
-          {/* MULTIPLE PROJECT SCHEDULE TEMPLATE CONTAINER */}
-          <div className={`bg-white rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-sm space-y-4 transition-all ${
-            screenshotMode ? 'fixed inset-0 z-50 rounded-none overflow-auto p-6 bg-white' : ''
-          }`}>
-            {/* Top Toolbar */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 bg-slate-900 text-white text-[10px] font-black uppercase rounded tracking-wider">
-                    Limkokwing SPM Proposal
-                  </span>
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">
-                    5 Projects • 52-Week Calendar
-                  </span>
-                  {screenshotMode && (
-                    <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded animate-pulse">
-                      📸 Screenshot Mode Active (Press Esc or Exit button)
-                    </span>
-                  )}
-                </div>
-                <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight mt-1 font-sans">
-                  MULTIPLE PROJECT SCHEDULE TEMPLATE
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Section 14 Implementation Roadmap • MVP Stabilization, Biometrics, Cloud Sync, ERP & Native Mobile
-                </p>
-              </div>
+          {/* Controls & Mode Toolbar */}
+          <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-xs font-bold text-slate-500 mr-1">View Schedule:</span>
+              <button
+                onClick={() => setTimelineViewMode('all')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  timelineViewMode === 'all'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                Combined (All-in-One)
+              </button>
+              <button
+                onClick={() => setTimelineViewMode('mvp')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  timelineViewMode === 'mvp'
+                    ? 'bg-rose-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                6-Week MVP Timeline
+              </button>
+              <button
+                onClick={() => setTimelineViewMode('future')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  timelineViewMode === 'future'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                Future Development (2027)
+              </button>
+            </div>
 
-              {/* Toolbar Controls */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Style Toggle */}
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-bold">
-                  <button
-                    onClick={() => setLabelStyle('template')}
-                    className={`px-2.5 py-1 rounded-md transition-all ${
-                      labelStyle === 'template' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                    title="Exact labels like the template image (Task 1, Task 2...)"
-                  >
-                    Template Labels
-                  </button>
-                  <button
-                    onClick={() => setLabelStyle('detailed')}
-                    className={`px-2.5 py-1 rounded-md transition-all ${
-                      labelStyle === 'detailed' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                    title="Descriptive deliverables from proposal"
-                  >
-                    Deliverable Names
-                  </button>
-                </div>
-
-                {/* Zoom Fit Controls */}
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-bold">
-                  <span className="px-2 text-slate-400 text-[10px] uppercase font-mono">Zoom</span>
-                  {[
-                    { label: '75%', val: 75 },
-                    { label: '85%', val: 85 },
-                    { label: '100%', val: 100 }
-                  ].map(z => (
-                    <button
-                      key={z.val}
-                      onClick={() => setZoomScale(z.val)}
-                      className={`px-2 py-1 rounded-md transition-all ${
-                        zoomScale === z.val ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
-                      }`}
-                    >
-                      {z.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Team Member Filter */}
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-bold">
-                  <button
-                    onClick={() => setSelectedAssignee('All')}
-                    className={`px-2 py-1 rounded-md transition-all ${
-                      selectedAssignee === 'All' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    All
-                  </button>
-                  {TEAM_MEMBERS.map(m => (
-                    <button
-                      key={m.name}
-                      onClick={() => setSelectedAssignee(selectedAssignee === m.name ? 'All' : m.name)}
-                      className={`px-2 py-1 rounded-md transition-all ${
-                        selectedAssignee === m.name ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      {m.name.split(' ')[0]}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Screenshot Focus Mode Button */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs font-bold">
+                <span className="px-2 text-slate-400 text-[10px] uppercase font-mono">Member:</span>
                 <button
-                  onClick={() => setScreenshotMode(!screenshotMode)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${
-                    screenshotMode
-                      ? 'bg-rose-600 text-white border-rose-700 shadow-sm'
-                      : 'bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-700 shadow-sm'
+                  onClick={() => setSelectedAssignee('All')}
+                  className={`px-2.5 py-1 rounded-lg transition-all ${
+                    selectedAssignee === 'All' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
                   }`}
-                  title={screenshotMode ? 'Exit Screenshot View' : 'Focus for clean single-screen screenshot'}
                 >
-                  <Camera className="w-3.5 h-3.5" />
-                  <span>{screenshotMode ? 'Exit Screenshot View' : '📸 Screenshot Mode'}</span>
+                  All
                 </button>
+                {MVP_TIMELINE.map(m => (
+                  <button
+                    key={m.name}
+                    onClick={() => setSelectedAssignee(selectedAssignee === m.name ? 'All' : m.name)}
+                    className={`px-2 py-1 rounded-lg transition-all ${
+                      selectedAssignee === m.name ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {m.name.split(' ')[0]}
+                  </button>
+                ))}
               </div>
-            </div>
 
-            {/* Hint for easy screenshot */}
-            <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
-              <div className="flex items-center gap-3">
-                <span className="font-semibold text-slate-700">💡 Screenshot Tip:</span>
-                <span>Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[10px] text-slate-800">Win</kbd> + <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[10px] text-slate-800">Shift</kbd> + <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[10px] text-slate-800">S</kbd> to snip.</span>
-                <span>Zoom <strong>85%</strong> fits all 5 projects on a 1080p screen.</span>
+              <button
+                onClick={() => setScreenshotMode(!screenshotMode)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                  screenshotMode
+                    ? 'bg-rose-600 text-white border-rose-700 shadow-xs'
+                    : 'bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-700 shadow-xs'
+                }`}
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>{screenshotMode ? 'Exit Fullscreen' : '📸 Focus for Screenshot'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* MVP 6-WEEK GANTT CHART (Exact replica of user's uploaded image) */}
+          {(timelineViewMode === 'all' || timelineViewMode === 'mvp') && (
+            <div className={`bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-7 space-y-4 transition-all ${
+              screenshotMode ? 'fixed inset-0 z-50 rounded-none overflow-auto p-8 bg-white' : ''
+            }`}>
+              {/* Header Title from user's image */}
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 border-b border-slate-100 pb-3">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight font-sans">
+                    ElevateHR — Project Timeline
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                    6-Week Gantt Chart - June W1 – July W6
+                  </p>
+                </div>
+                <div className="text-[11px] text-slate-400 font-mono">
+                  Limkokwing Software Project Management
+                </div>
               </div>
-              {selectedAssignee !== 'All' && (
-                <div className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  Highlighting: {selectedAssignee}
-                </div>
-              )}
-            </div>
 
-            {/* The Visual Schedule Grid with dynamic zoom */}
-            <div
-              className="overflow-x-auto border border-slate-300 rounded-sm bg-white shadow-xs"
-              style={{
-                transformOrigin: 'top left',
-                transform: zoomScale !== 100 ? `scale(${zoomScale / 100})` : 'none',
-                width: zoomScale !== 100 ? `${(100 / zoomScale) * 100}%` : '100%',
-                marginBottom: zoomScale !== 100 ? `-${(100 - zoomScale) * 4}px` : '0px'
-              }}
-            >
-              <div className="min-w-[1140px] text-[10px]">
-                {/* 1. Header Row 1: Quarters (Q1, Q2, Q3, Q4) */}
-                <div className="flex border-b border-slate-300 font-black text-[11px] text-white">
-                  <div className="w-[220px] shrink-0 bg-white border-r border-slate-300"></div>
-                  {/* Q1: 13 weeks */}
-                  <div className="flex-[13] bg-[#1e293b] text-center py-1 border-r border-slate-700 tracking-wider">
-                    Q1
+              {/* Table Container */}
+              <div className="w-full border border-slate-200 rounded-lg overflow-hidden bg-white">
+                {/* Table Header */}
+                <div className="flex border-b border-slate-200 bg-white font-bold text-xs text-slate-800 divide-x divide-slate-200">
+                  <div className="w-[30%] min-w-[160px] py-2.5 px-4 text-left">
+                    Team Member / Task
                   </div>
-                  {/* Q2: 13 weeks */}
-                  <div className="flex-[13] bg-[#15803d] text-center py-1 border-r border-green-800 tracking-wider">
-                    Q2
-                  </div>
-                  {/* Q3: 13 weeks */}
-                  <div className="flex-[13] bg-[#475569] text-center py-1 border-r border-slate-700 tracking-wider">
-                    Q3
-                  </div>
-                  {/* Q4: 13 weeks */}
-                  <div className="flex-[13] bg-[#b45309] text-center py-1 tracking-wider">
-                    Q4
-                  </div>
+                  {MVP_COLUMNS.map(col => (
+                    <div key={col} className="flex-1 py-2.5 px-1 text-center truncate">
+                      {col}
+                    </div>
+                  ))}
                 </div>
 
-                {/* 2. Header Row 2: Months (January to December) */}
-                <div className="flex border-b border-slate-300 text-[9px] font-bold text-white uppercase">
-                  <div className="w-[220px] shrink-0 bg-slate-50 text-slate-500 font-medium text-[8px] italic text-right pr-2 py-0.5 border-r border-slate-300 truncate">
-                    Enter the date of the first Monday of each month ---&gt;
-                  </div>
-                  {TEMPLATE_MONTHS.map(m => {
-                    const monthBg =
-                      m.quarter === 'Q1'
-                        ? 'bg-[#1e293b] border-slate-700'
-                        : m.quarter === 'Q2'
-                        ? 'bg-[#15803d] border-green-800'
-                        : m.quarter === 'Q3'
-                        ? 'bg-[#475569] border-slate-700'
-                        : 'bg-[#b45309] border-amber-800';
-                    return (
-                      <div
-                        key={m.name}
-                        style={{ flex: m.dates.length }}
-                        className={`${monthBg} text-center py-0.5 border-r tracking-tight truncate`}
-                      >
-                        {m.name}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* 3. Header Row 3: Monday Dates */}
-                <div className="flex border-b border-slate-300 font-mono text-[8px] font-bold text-slate-700">
-                  <div className="w-[220px] shrink-0 bg-slate-50 border-r border-slate-300"></div>
-                  {ALL_52_WEEKS.map(w => {
-                    const weekBg =
-                      w.quarter === 'Q1'
-                        ? 'bg-slate-50'
-                        : w.quarter === 'Q2'
-                        ? 'bg-[#ecfdf5]'
-                        : w.quarter === 'Q3'
-                        ? 'bg-slate-100'
-                        : 'bg-[#fefce8]';
-                    return (
-                      <div
-                        key={w.index}
-                        className={`flex-1 text-center py-0.5 border-r border-slate-300 ${weekBg}`}
-                      >
-                        {w.date}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* 4. Projects & Tasks Schedule */}
+                {/* Member Sections */}
                 <div className="divide-y divide-slate-200">
-                  {SCHEDULE_PROJECTS.map(project => (
-                    <div key={project.id} className="border-b-2 border-slate-300/80">
-                      {/* Project Header Row */}
-                      <div className="flex items-center h-[22px] border-b border-slate-200 font-bold">
-                        {/* Project Header Title */}
-                        <div
-                          className={`w-[220px] shrink-0 h-full ${project.headerBg} px-2 flex items-center justify-between border-r border-slate-300 text-[10px] tracking-wider uppercase font-black`}
-                        >
-                          <span className="truncate">{project.name}</span>
-                          <span className="text-[8px] font-normal opacity-80 hidden sm:inline">
-                            {project.subtitle.split(' ')[0]}
-                          </span>
-                        </div>
+                  {MVP_TIMELINE.map(member => {
+                    const isMemberActive =
+                      selectedAssignee === 'All' ||
+                      selectedAssignee === member.name;
 
-                        {/* Project Schedule Area with Summary Bar */}
-                        <div className="flex-1 relative h-full flex items-center">
-                          {/* 52 Grid columns */}
-                          <div className="absolute inset-0 flex">
-                            {ALL_52_WEEKS.map(w => {
-                              const cellBg =
-                                w.quarter === 'Q1'
-                                  ? 'bg-white'
-                                  : w.quarter === 'Q2'
-                                  ? 'bg-[#ecfdf5]/40'
-                                  : w.quarter === 'Q3'
-                                  ? 'bg-[#f8fafc]'
-                                  : 'bg-[#fefce8]/40';
-                              return (
-                                <div
-                                  key={w.index}
-                                  className={`flex-1 h-full border-r border-slate-200 ${cellBg}`}
-                                />
-                              );
-                            })}
+                    return (
+                      <div
+                        key={member.name}
+                        className={`transition-opacity ${isMemberActive ? 'opacity-100' : 'opacity-25'}`}
+                      >
+                        {/* Member Name Row */}
+                        <div className="flex items-center h-8 bg-slate-50/40 border-b border-slate-100">
+                          <div className={`w-[30%] min-w-[160px] px-4 font-bold text-xs ${member.color}`}>
+                            {member.name}
                           </div>
-
-                          {/* Continuous Parent Bar */}
-                          <div
-                            className={`absolute h-[14px] rounded-[2px] ${project.parentBarColor} shadow-xs z-10 transition-all`}
-                            style={{
-                              left: `${(project.parentStart / 52) * 100}%`,
-                              width: `${((project.parentEnd - project.parentStart + 1) / 52) * 100}%`
-                            }}
-                            title={`${project.name}: ${project.subtitle} (${project.phaseCode})`}
-                          />
+                          <div className="flex-1 h-full divide-x divide-slate-100 flex">
+                            {MVP_COLUMNS.map(col => (
+                              <div key={col} className="flex-1 h-full" />
+                            ))}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Project Task Sub-Rows */}
-                      {project.tasks.map(task => {
-                        const isHighlighted =
-                          selectedAssignee === 'All' ||
-                          task.assignee === selectedAssignee ||
-                          task.assignee === 'All Members';
-
-                        return (
-                          <div
-                            key={task.code + task.title}
-                            className={`flex items-center h-[20px] border-b border-slate-100 transition-opacity ${
-                              isHighlighted ? 'opacity-100' : 'opacity-25'
-                            }`}
-                          >
-                            {/* Task Label Cell */}
-                            <div
-                              className={`w-[220px] shrink-0 h-full ${project.labelBg} px-2 flex items-center justify-between border-r border-slate-300 text-[9.5px] font-medium text-slate-800`}
-                            >
-                              <span className="truncate">
-                                {labelStyle === 'template' ? (
-                                  <span className="font-semibold text-slate-900">{task.code}</span>
-                                ) : (
-                                  <span>
-                                    <strong className="text-slate-900 mr-1">{task.code}:</strong>
-                                    {task.title}
-                                  </span>
-                                )}
-                              </span>
-                              {labelStyle === 'detailed' && (
-                                <span className="text-[8px] font-bold text-slate-500 shrink-0 ml-1">
-                                  {task.assignee.split(' ')[0]}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Task Timeline Area */}
-                            <div className="flex-1 relative h-full flex items-center">
-                              {/* 52 Grid columns */}
-                              <div className="absolute inset-0 flex">
-                                {ALL_52_WEEKS.map(w => {
-                                  const cellBg =
-                                    w.quarter === 'Q1'
-                                      ? 'bg-white'
-                                      : w.quarter === 'Q2'
-                                      ? 'bg-[#ecfdf5]/40'
-                                      : w.quarter === 'Q3'
-                                      ? 'bg-[#f8fafc]'
-                                      : 'bg-[#fefce8]/40';
-                                  return (
-                                    <div
-                                      key={w.index}
-                                      className={`flex-1 h-full border-r border-slate-200 ${cellBg}`}
-                                    />
-                                  );
-                                })}
+                        {/* Task Rows */}
+                        <div className="divide-y divide-slate-50">
+                          {member.tasks.map(task => (
+                            <div key={task.name} className="flex items-center h-9 hover:bg-slate-50/50 transition-colors">
+                              {/* Task Name */}
+                              <div className="w-[30%] min-w-[160px] px-4 text-xs text-slate-700 truncate font-normal" title={task.name}>
+                                {task.name}
                               </div>
 
-                              {/* Continuous Cascading Task Bar */}
+                              {/* 6-Week Gantt Area */}
+                              <div className="flex-1 h-full relative flex items-center">
+                                {/* Vertical Grid Lines */}
+                                <div className="absolute inset-0 flex divide-x divide-slate-100 pointer-events-none">
+                                  {MVP_COLUMNS.map(col => (
+                                    <div key={col} className="flex-1 h-full" />
+                                  ))}
+                                </div>
+
+                                {/* Continuous Colored Task Bar */}
+                                <div
+                                  className="absolute h-7 px-1 flex items-center transition-all z-10"
+                                  style={{
+                                    left: `${(task.startCol / 6) * 100}%`,
+                                    width: `${((task.endCol - task.startCol + 1) / 6) * 100}%`
+                                  }}
+                                >
+                                  <div
+                                    className={`w-full h-full ${member.barColor} rounded-xs shadow-xs hover:brightness-105 transition-all`}
+                                    title={`${member.name}: ${task.name} (${MVP_COLUMNS[task.startCol]} to ${MVP_COLUMNS[task.endCol]}) - ${task.deliverable}`}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* FUTURE DEVELOPMENT ROADMAP (Post-MVP Horizons) */}
+          {(timelineViewMode === 'all' || timelineViewMode === 'future') && (
+            <div className={`bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-7 space-y-4 transition-all ${
+              screenshotMode && timelineViewMode === 'future' ? 'fixed inset-0 z-50 rounded-none overflow-auto p-8 bg-white' : ''
+            }`}>
+              {/* Header Title */}
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 border-b border-slate-100 pb-3">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight font-sans">
+                    ElevateHR — Future Development Roadmap
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                    Post-MVP 4-Phase Implementation Horizon - Q1 2027 – Q4 2027
+                  </p>
+                </div>
+                <div className="text-[11px] text-slate-400 font-mono">
+                  Proposal Section 14 Roadmap
+                </div>
+              </div>
+
+              {/* Table Container */}
+              <div className="w-full border border-slate-200 rounded-lg overflow-hidden bg-white">
+                {/* Table Header */}
+                <div className="flex border-b border-slate-200 bg-white font-bold text-xs text-slate-800 divide-x divide-slate-200">
+                  <div className="w-[34%] min-w-[180px] py-2.5 px-4 text-left">
+                    Phase / Strategic Milestone
+                  </div>
+                  {FUTURE_COLUMNS.map(col => (
+                    <div key={col} className="flex-1 py-2.5 px-1 text-center truncate">
+                      {col}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Phase Sections */}
+                <div className="divide-y divide-slate-200">
+                  {FUTURE_PHASES.map(phase => (
+                    <div key={phase.phase}>
+                      {/* Phase Header Row */}
+                      <div className="flex items-center h-8 bg-slate-50/50 border-b border-slate-100">
+                        <div className={`w-[34%] min-w-[180px] px-4 font-bold text-xs ${phase.color} flex items-center justify-between`}>
+                          <span>{phase.phase}: {phase.title}</span>
+                          <span className="text-[10px] text-slate-400 font-normal hidden sm:inline">{phase.lead}</span>
+                        </div>
+                        <div className="flex-1 h-full divide-x divide-slate-100 flex">
+                          {FUTURE_COLUMNS.map(col => (
+                            <div key={col} className="flex-1 h-full" />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Task Rows */}
+                      <div className="divide-y divide-slate-50">
+                        {phase.tasks.map(task => (
+                          <div key={task.name} className="flex items-center h-9 hover:bg-slate-50/50 transition-colors">
+                            {/* Task Name */}
+                            <div className="w-[34%] min-w-[180px] px-4 text-xs text-slate-700 truncate font-normal" title={task.name}>
+                              {task.name}
+                            </div>
+
+                            {/* 4-Quarter Gantt Area */}
+                            <div className="flex-1 h-full relative flex items-center">
+                              {/* Vertical Grid Lines */}
+                              <div className="absolute inset-0 flex divide-x divide-slate-100 pointer-events-none">
+                                {FUTURE_COLUMNS.map(col => (
+                                  <div key={col} className="flex-1 h-full" />
+                                ))}
+                              </div>
+
+                              {/* Continuous Colored Task Bar */}
                               <div
-                                className={`absolute h-[13px] rounded-[2px] ${project.barColor} shadow-xs z-10 transition-all cursor-pointer hover:brightness-110`}
+                                className="absolute h-7 px-1 flex items-center transition-all z-10"
                                 style={{
-                                  left: `${(task.start / 52) * 100}%`,
-                                  width: `${((task.end - task.start + 1) / 52) * 100}%`
+                                  left: `${(task.startCol / 4) * 100}%`,
+                                  width: `${((task.endCol - task.startCol + 1) / 4) * 100}%`
                                 }}
-                                title={`${task.code}: ${task.title} • Assignee: ${task.assignee} • Deliverable: ${task.deliverables}`}
-                              />
+                              >
+                                <div
+                                  className={`w-full h-full ${phase.barColor} rounded-xs shadow-xs hover:brightness-105 transition-all`}
+                                  title={`${phase.title}: ${task.name} (${FUTURE_COLUMNS[task.startCol]} to ${FUTURE_COLUMNS[task.endCol]}) - ${task.deliverables}`}
+                                />
+                              </div>
                             </div>
                           </div>
-                        );
-                      })}
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Milestone Summary & Signoff Card */}
           <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-3">
