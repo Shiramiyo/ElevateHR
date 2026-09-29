@@ -11,48 +11,301 @@ import {
   ArrowRight,
   Shield,
   FileCode2,
-  CheckCircle2
+  CheckCircle2,
+  Calendar,
+  Users,
+  Clock,
+  Sparkles
 } from 'lucide-react';
 
+interface GanttTask {
+  id: string;
+  name: string;
+  phase: string;
+  assignee: 'Chhong Dyne' | 'Kith Annsreng' | 'Leng Panhaleap' | 'Kim Menghorpisith' | 'All Members';
+  role: string;
+  startWeek: number; // 1 to 14
+  durationWeeks: number;
+  progress: number;
+  status: 'Completed' | 'In Progress' | 'Planned';
+  deliverables: string;
+}
+
+const GANTT_TASKS: GanttTask[] = [
+  {
+    id: 'TSK-01',
+    name: 'Requirements Gathering & Proposal Specification',
+    phase: 'Phase 1: Planning',
+    assignee: 'Chhong Dyne',
+    role: 'Full-Stack Lead',
+    startWeek: 1,
+    durationWeeks: 2,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Proposal Document, Scope, Objectives & Target Personas'
+  },
+  {
+    id: 'TSK-02',
+    name: 'UI/UX Design System & Figma Wireframes',
+    phase: 'Phase 1: Planning',
+    assignee: 'Kim Menghorpisith',
+    role: 'UI/UX Designer',
+    startWeek: 2,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Figma Component Library, Color System, Mobile Layouts'
+  },
+  {
+    id: 'TSK-03',
+    name: 'System Architecture & Relational ERD Modeling',
+    phase: 'Phase 1: Planning',
+    assignee: 'Chhong Dyne',
+    role: 'Full-Stack Lead',
+    startWeek: 2,
+    durationWeeks: 2,
+    progress: 100,
+    status: 'Completed',
+    deliverables: '3-Tier Data Flow Diagram, ERD Relational Entities'
+  },
+  {
+    id: 'TSK-04',
+    name: 'Express REST API & Database Schema Engine',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Chhong Dyne',
+    role: 'Full-Stack Lead',
+    startWeek: 4,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'JSON Database Models, CRUD Endpoints, Seed Data'
+  },
+  {
+    id: 'TSK-05',
+    name: 'React + Vite Frontend Shell & RBAC Navigation',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Kith Annsreng',
+    role: 'Developer',
+    startWeek: 4,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Sidebar, Top Navbar, 1-Click Role/Persona Switcher'
+  },
+  {
+    id: 'TSK-06',
+    name: 'Employee Directory & MoLVT Work Permit Module',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Kith Annsreng',
+    role: 'Developer',
+    startWeek: 5,
+    durationWeeks: 4,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Staff Profiles, Expat FWCMS Tracking, Image Compression'
+  },
+  {
+    id: 'TSK-07',
+    name: 'Statutory Payroll Calculation & Progressive Tax Engine',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Chhong Dyne',
+    role: 'Full-Stack Lead',
+    startWeek: 6,
+    durationWeeks: 4,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Cambodia Tax Brackets, 4% NSSF, Overtime & Deductions'
+  },
+  {
+    id: 'TSK-08',
+    name: 'Leave Management & 1-Click Approval System',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Chhong Dyne',
+    role: 'Full-Stack Lead',
+    startWeek: 7,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Cambodia Arts. 166/182 Quotas, Overdraft Guard, Approvals'
+  },
+  {
+    id: 'TSK-09',
+    name: 'Daily Attendance Punch Clock & Punctuality Engine',
+    phase: 'Phase 3: Integration & Testing',
+    assignee: 'Kith Annsreng',
+    role: 'Developer',
+    startWeek: 8,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Attendance Punching, Punctuality Metrics, Hours Tracking'
+  },
+  {
+    id: 'TSK-10',
+    name: 'Compliance Document Repository & Real File Uploads',
+    phase: 'Phase 3: Integration & Testing',
+    assignee: 'Kith Annsreng',
+    role: 'Developer',
+    startWeek: 9,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'NSSF Card, Passport & Contract Uploads/Downloads'
+  },
+  {
+    id: 'TSK-11',
+    name: 'RBAC Security Audit & Endpoint Vulnerability Testing',
+    phase: 'Phase 3: Integration & Testing',
+    assignee: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    startWeek: 10,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Rate Limiting, XSS Sanitization, Helmet Headers, Auth Checks'
+  },
+  {
+    id: 'TSK-12',
+    name: 'Cambodian Labor Law Compliance & Edge Case Audit',
+    phase: 'Phase 3: Integration & Testing',
+    assignee: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    startWeek: 11,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Seniority Accruals, Maternity Pay, Sick Tier Validation'
+  },
+  {
+    id: 'TSK-13',
+    name: 'Executive Dashboard & Department Distribution Charts',
+    phase: 'Phase 4: Finalization & UAT',
+    assignee: 'Kim Menghorpisith',
+    role: 'UI/UX Designer',
+    startWeek: 11,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'High-Contrast White Tooltips, Donut & Bar Charts, Cards'
+  },
+  {
+    id: 'TSK-14',
+    name: 'PDF & Excel Reporting Engines (Client-Side Generators)',
+    phase: 'Phase 4: Finalization & UAT',
+    assignee: 'Kith Annsreng',
+    role: 'Developer',
+    startWeek: 12,
+    durationWeeks: 2,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Confidential Payslip PDFs, Roster & Payroll Excel Sheets'
+  },
+  {
+    id: 'TSK-15',
+    name: 'Cloud Deployment on Render & Final Presentation UAT',
+    phase: 'Phase 4: Finalization & UAT',
+    assignee: 'All Members',
+    role: 'Core Project Team',
+    startWeek: 13,
+    durationWeeks: 2,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Production Web App on Render, Technical Documentation'
+  }
+];
+
+const TEAM_MEMBERS = [
+  {
+    name: 'Chhong Dyne',
+    role: 'Full-Stack Lead / Problem-Solving',
+    email: 'dynechhoeng@gmail.com',
+    quote: 'Focused on understanding user needs to build practical HR solutions.',
+    color: 'border-emerald-500 bg-emerald-50 text-emerald-700',
+    barColor: 'bg-emerald-600',
+    tasksCount: 5,
+    hours: '350 - 500 hrs'
+  },
+  {
+    name: 'Kith Annsreng',
+    role: 'Developer / Integration',
+    email: 'sreng.kith@gmail.com',
+    quote: 'Good user experience is key.',
+    color: 'border-blue-500 bg-blue-50 text-blue-700',
+    barColor: 'bg-blue-600',
+    tasksCount: 5,
+    hours: '300 - 450 hrs'
+  },
+  {
+    name: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    email: 'lengpanhaleap@gmail.com',
+    quote: 'Test app and observe missing implementation.',
+    color: 'border-amber-500 bg-amber-50 text-amber-700',
+    barColor: 'bg-amber-600',
+    tasksCount: 3,
+    hours: '80 - 120 hrs'
+  },
+  {
+    name: 'Kim Menghorpisith',
+    role: 'UI/UX Designer',
+    email: 'kmhpisith@gmail.com',
+    quote: 'Functions over forms.',
+    color: 'border-purple-500 bg-purple-50 text-purple-700',
+    barColor: 'bg-purple-600',
+    tasksCount: 3,
+    hours: '60 - 80 hrs'
+  }
+];
+
 export const ArchitectureViewer: React.FC = () => {
-  const [activeView, setActiveView] = useState<'architecture' | 'erd' | 'scope'>('architecture');
+  const [activeView, setActiveView] = useState<'architecture' | 'erd' | 'scope' | 'timeline'>('timeline');
+  const [selectedAssignee, setSelectedAssignee] = useState<string>('All');
 
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">System Architecture & ERD Diagram</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">System Architecture & Project Work Plan</h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Technical specifications, client-server data flow, and relational database schema
+            Limkokwing University • Software Project Management (Carlos Perez) • 14-Week MVP Roadmap
           </p>
         </div>
 
         {/* View Switcher */}
-        <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl">
+        <div className="flex items-center space-x-1 sm:space-x-2 bg-slate-100 p-1 rounded-xl flex-wrap gap-y-1">
+          <button
+            onClick={() => setActiveView('timeline')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeView === 'timeline' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Gantt Chart</span>
+          </button>
           <button
             onClick={() => setActiveView('architecture')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeView === 'architecture' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            System Architecture
+            Architecture
           </button>
           <button
             onClick={() => setActiveView('erd')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeView === 'erd' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            ERD Relational Schema
+            ERD Schema
           </button>
           <button
             onClick={() => setActiveView('scope')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeView === 'scope' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Proposal Compliance
+            Proposal Specs
           </button>
         </div>
       </div>
@@ -249,6 +502,189 @@ export const ArchitectureViewer: React.FC = () => {
                 <li><strong>Compliance & Reports:</strong> Exportable master rosters, payroll workbooks, and PDF payslips.</li>
                 <li><strong>Document Management:</strong> NSSF card, passport/ID, and CV verification tracking.</li>
               </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeView === 'timeline' && (
+        <div className="space-y-6">
+          {/* Team Contribution Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {TEAM_MEMBERS.map(m => (
+              <div
+                key={m.name}
+                onClick={() => setSelectedAssignee(selectedAssignee === m.name ? 'All' : m.name)}
+                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer bg-white shadow-xs hover:shadow-md ${
+                  selectedAssignee === m.name ? 'border-emerald-600 ring-2 ring-emerald-500/20' : 'border-slate-200'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${m.color}`}>
+                    {m.tasksCount} Tasks
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono font-semibold">{m.hours}</span>
+                </div>
+                <div className="font-extrabold text-sm text-slate-900 mt-2">{m.name}</div>
+                <div className="text-xs font-semibold text-slate-500">{m.role}</div>
+                <div className="text-[11px] text-slate-400 mt-2 italic line-clamp-2">“{m.quote}”</div>
+                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                  <span>{m.email}</span>
+                  <span className="text-emerald-600 font-bold">100% On-Track</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Gantt Chart Container */}
+          <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/80 shadow-xs space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-full border border-emerald-300">
+                    14-Week Development Lifecycle
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">Q4 2026 – Q1 2027</span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mt-1">Project Work Plan & Team Gantt Roadmap</h3>
+                <p className="text-xs text-slate-500">
+                  Milestone execution schedule for Limkokwing University Software Project Management
+                </p>
+              </div>
+
+              {/* Filter by Team Member */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  onClick={() => setSelectedAssignee('All')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    selectedAssignee === 'All' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  All ({GANTT_TASKS.length})
+                </button>
+                {TEAM_MEMBERS.map(m => (
+                  <button
+                    key={m.name}
+                    onClick={() => setSelectedAssignee(m.name)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                      selectedAssignee === m.name ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {m.name.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Visual Timeline Gantt Table */}
+            <div className="overflow-x-auto border border-slate-200 rounded-2xl">
+              <div className="min-w-[900px]">
+                {/* Timeline Month & Week Headers */}
+                <div className="grid grid-cols-12 bg-slate-900 text-white text-[11px] font-bold border-b border-slate-800 divide-x divide-slate-800">
+                  <div className="col-span-4 p-3 text-left">Task Deliverable & Assignee</div>
+                  <div className="col-span-2 p-3 text-center bg-slate-800/80">Month 1 (W1 - W3)</div>
+                  <div className="col-span-3 p-3 text-center bg-slate-800/60">Month 2 (W4 - W7)</div>
+                  <div className="col-span-2 p-3 text-center bg-slate-800/80">Month 3 (W8 - W11)</div>
+                  <div className="col-span-1 p-3 text-center bg-slate-800/60">M4 (W12-14)</div>
+                </div>
+
+                {/* Week Columns Subheader */}
+                <div className="grid grid-cols-12 bg-slate-100 text-slate-500 text-[10px] font-mono border-b border-slate-200 divide-x divide-slate-200">
+                  <div className="col-span-4 px-3 py-1.5 font-sans font-semibold text-slate-700">14-Week Timeline</div>
+                  {Array.from({ length: 14 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="text-center py-1.5 font-bold"
+                      style={{ width: `${(8 / 14) * (100 / 8)}%` }} // Equal week distribution
+                    >
+                      W{i + 1}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Task Rows */}
+                <div className="divide-y divide-slate-100">
+                  {GANTT_TASKS.filter(t => selectedAssignee === 'All' || t.assignee === selectedAssignee || t.assignee === 'All Members').map(task => {
+                    const member = TEAM_MEMBERS.find(m => m.name === task.assignee);
+                    const barColor = member ? member.barColor : 'bg-slate-700';
+
+                    // Compute start offset and width in % across the 14-week timeline (which spans the right 8 columns = 66.666%)
+                    const startPercent = ((task.startWeek - 1) / 14) * 100;
+                    const widthPercent = (task.durationWeeks / 14) * 100;
+
+                    return (
+                      <div key={task.id} className="grid grid-cols-12 items-center hover:bg-slate-50/80 transition-colors">
+                        {/* Task Meta (Left 4 columns) */}
+                        <div className="col-span-4 p-3 border-r border-slate-100 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-slate-900 leading-tight">{task.name}</span>
+                            <span className="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0 ml-1">
+                              ✓ 100%
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                            <span className="font-semibold text-slate-700">{task.assignee}</span>
+                            <span>•</span>
+                            <span className="text-slate-400 font-mono">W{task.startWeek}–W{task.startWeek + task.durationWeeks - 1} ({task.durationWeeks}wks)</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            🎯 {task.deliverables}
+                          </div>
+                        </div>
+
+                        {/* Gantt Bar Visualization (Right 8 columns) */}
+                        <div className="col-span-8 p-3 relative h-14 flex items-center">
+                          {/* Background Grid Lines */}
+                          <div className="absolute inset-0 grid grid-cols-14 divide-x divide-slate-100 pointer-events-none">
+                            {Array.from({ length: 14 }).map((_, idx) => (
+                              <div key={idx} className="h-full" />
+                            ))}
+                          </div>
+
+                          {/* The Active Task Bar */}
+                          <div
+                            className={`absolute h-7 rounded-xl ${barColor} text-white shadow-sm flex items-center px-2.5 text-[10px] font-bold tracking-tight overflow-hidden transition-all`}
+                            style={{
+                              left: `${startPercent}%`,
+                              width: `${Math.max(widthPercent, 7)}%`
+                            }}
+                            title={`${task.name} (${task.assignee}) - Week ${task.startWeek} to ${task.startWeek + task.durationWeeks - 1}`}
+                          >
+                            <span className="truncate">{task.name}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Milestone Summary & Signoff */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100 text-xs">
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Phase 1: Planning (Weeks 1–3)
+                </div>
+                <div className="text-slate-500 text-[11px]">Requirements specification, Figma design library, system architecture & ERD schema.</div>
+                <div className="text-emerald-700 font-semibold text-[10px]">Status: Verified & Approved</div>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Phase 2 & 3: Dev & QA (Weeks 4–11)
+                </div>
+                <div className="text-slate-500 text-[11px]">REST API, Cambodia payroll tax engine, leave approval rules, attendance tracking, and penetration audit.</div>
+                <div className="text-emerald-700 font-semibold text-[10px]">Status: Verified & Approved</div>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Phase 4: Deploy & UAT (Weeks 12–14)
+                </div>
+                <div className="text-slate-500 text-[11px]">Render cloud deployment, automated PDF/Excel reports, and final university defense.</div>
+                <div className="text-emerald-700 font-semibold text-[10px]">Status: Production Ready (Render)</div>
+              </div>
             </div>
           </div>
         </div>
