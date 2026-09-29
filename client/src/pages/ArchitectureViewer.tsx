@@ -38,6 +38,7 @@ interface GanttTask {
 const WEEKS_TIMELINE = ['June W1', 'June W2', 'July W3', 'July W4', 'July W5', 'July W6'];
 
 const GANTT_TASKS: GanttTask[] = [
+  // --- Phase 1: Planning & Architecture (June W1 – W2) ---
   {
     id: 'TSK-01',
     name: 'Requirements Gathering & Proposal Specification',
@@ -45,25 +46,13 @@ const GANTT_TASKS: GanttTask[] = [
     assignee: 'Choeng Dyne',
     role: 'Full-Stack Lead',
     startWeek: 1,
-    durationWeeks: 1,
+    durationWeeks: 2,
     progress: 100,
     status: 'Completed',
     deliverables: 'Proposal Document, Scope, Objectives & Target Personas'
   },
   {
     id: 'TSK-02',
-    name: 'Market Research & Competitive Feasibility',
-    phase: 'Phase 1: Planning',
-    assignee: 'Choeng Dyne',
-    role: 'Full-Stack Lead',
-    startWeek: 1,
-    durationWeeks: 2,
-    progress: 100,
-    status: 'Completed',
-    deliverables: 'Cambodian HRMS landscape & statutory compliance analysis'
-  },
-  {
-    id: 'TSK-03',
     name: 'UI/UX Design System & Figma Wireframes',
     phase: 'Phase 1: Planning',
     assignee: 'Kim Menghorpisith',
@@ -72,23 +61,73 @@ const GANTT_TASKS: GanttTask[] = [
     durationWeeks: 2,
     progress: 100,
     status: 'Completed',
-    deliverables: 'Figma Component Library, Color System, Mobile Layouts'
+    deliverables: 'Figma Component Library, Color Tokens, Mobile Layouts'
+  },
+  {
+    id: 'TSK-03',
+    name: 'QA Test Strategy & Compliance Criteria Formulation',
+    phase: 'Phase 1: Planning',
+    assignee: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    startWeek: 1,
+    durationWeeks: 2,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Test Plan, MoLVT Compliance Checklists, Risk Matrix'
   },
   {
     id: 'TSK-04',
-    name: 'Goals, Objectives & System Architecture ERD',
+    name: 'System Architecture & Relational ERD Modeling',
     phase: 'Phase 1: Planning',
     assignee: 'Choeng Dyne',
     role: 'Full-Stack Lead',
-    startWeek: 2,
-    durationWeeks: 1,
+    startWeek: 1,
+    durationWeeks: 2,
     progress: 100,
     status: 'Completed',
     deliverables: '3-Tier Data Flow Diagram, ERD Relational Entities'
   },
   {
     id: 'TSK-05',
-    name: 'Software Requirements & Technology Stack Modeling',
+    name: 'Frontend Architecture & Development Environment Setup',
+    phase: 'Phase 1: Planning',
+    assignee: 'Kith Annsreng',
+    role: 'Developer',
+    startWeek: 1,
+    durationWeeks: 2,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Vite SPA Tooling, Tailwind Config, Code Formatting Pipeline'
+  },
+
+  // --- Phase 2: Core Engineering (June W2 – July W5) ---
+  {
+    id: 'TSK-06',
+    name: 'Express REST API & Database Schema Engine',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Choeng Dyne',
+    role: 'Full-Stack Lead',
+    startWeek: 2,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Node/Express REST Architecture, JSON Data Store, Seed Fixtures'
+  },
+  {
+    id: 'TSK-07',
+    name: 'High-Fidelity UI Prototypes & Mobile Design Tokens',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Kim Menghorpisith',
+    role: 'UI/UX Designer',
+    startWeek: 2,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Interactive Prototypes, Micro-interactions, WCAG Standards'
+  },
+  {
+    id: 'TSK-08',
+    name: 'React + Vite Frontend Shell & RBAC Navigation',
     phase: 'Phase 2: Core Engineering',
     assignee: 'Kith Annsreng',
     role: 'Developer',
@@ -96,70 +135,82 @@ const GANTT_TASKS: GanttTask[] = [
     durationWeeks: 3,
     progress: 100,
     status: 'Completed',
-    deliverables: 'Express REST architecture, Vite SPA, SQLite/JSON models'
-  },
-  {
-    id: 'TSK-06',
-    name: 'Project Scope & Database Schema Engine',
-    phase: 'Phase 2: Core Engineering',
-    assignee: 'Kith Annsreng',
-    role: 'Developer',
-    startWeek: 3,
-    durationWeeks: 2,
-    progress: 100,
-    status: 'Completed',
-    deliverables: 'JSON Database Models, CRUD Endpoints, Seed Data'
-  },
-  {
-    id: 'TSK-07',
-    name: 'React + Vite Frontend Shell & RBAC Navigation',
-    phase: 'Phase 2: Core Engineering',
-    assignee: 'Kith Annsreng',
-    role: 'Developer',
-    startWeek: 3,
-    durationWeeks: 2,
-    progress: 100,
-    status: 'Completed',
     deliverables: 'Sidebar, Top Navbar, 1-Click Role/Persona Switcher'
   },
   {
-    id: 'TSK-08',
+    id: 'TSK-09',
+    name: 'Database Schema & REST API Functional Testing',
+    phase: 'Phase 2: Core Engineering',
+    assignee: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    startWeek: 2,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'Endpoint Validation, Status Code Verifications, Edge Cases'
+  },
+  {
+    id: 'TSK-10',
     name: 'Employee Directory & MoLVT Work Permit Module',
     phase: 'Phase 2: Core Engineering',
     assignee: 'Kith Annsreng',
     role: 'Developer',
     startWeek: 3,
-    durationWeeks: 2,
+    durationWeeks: 3,
     progress: 100,
     status: 'Completed',
     deliverables: 'Staff Profiles, Expat FWCMS Tracking, Image Compression'
   },
   {
-    id: 'TSK-09',
-    name: 'Statutory Payroll Calculation & Progressive Tax Engine',
+    id: 'TSK-11',
+    name: 'Statutory Cambodian Payroll Tax & NSSF Engine',
     phase: 'Phase 2: Core Engineering',
     assignee: 'Choeng Dyne',
     role: 'Full-Stack Lead',
     startWeek: 3,
-    durationWeeks: 2,
+    durationWeeks: 3,
     progress: 100,
     status: 'Completed',
     deliverables: 'Cambodia Tax Brackets, 4% NSSF, Overtime & Deductions'
   },
   {
-    id: 'TSK-10',
-    name: 'Leave Management & 1-Click Approval System',
+    id: 'TSK-12',
+    name: 'Cambodian Labor Law Compliance Verification (Arts. 166/182)',
+    phase: 'Phase 3: Integration & Testing',
+    assignee: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    startWeek: 3,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'MoLVT Article Compliance Audits, Maternity & Sick Leave Rules'
+  },
+  {
+    id: 'TSK-13',
+    name: 'Executive Dashboard & Department Analytics Visuals',
     phase: 'Phase 2: Core Engineering',
+    assignee: 'Kim Menghorpisith',
+    role: 'UI/UX Designer',
+    startWeek: 3,
+    durationWeeks: 3,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'High-Contrast White Tooltips, Donut & Bar Charts, Metric Cards'
+  },
+  {
+    id: 'TSK-14',
+    name: 'Leave Management & Full-Stack System Integration',
+    phase: 'Phase 3: Integration & Testing',
     assignee: 'Choeng Dyne',
     role: 'Full-Stack Lead',
     startWeek: 4,
-    durationWeeks: 2,
+    durationWeeks: 3,
     progress: 100,
     status: 'Completed',
-    deliverables: 'Cambodia Arts. 166/182 Quotas, Overdraft Guard, Approvals'
+    deliverables: 'Leave Approval Logic, Overdraft Guard, Cloud Integration'
   },
   {
-    id: 'TSK-11',
+    id: 'TSK-15',
     name: 'Daily Attendance Punch Clock & Punctuality Engine',
     phase: 'Phase 2: Core Engineering',
     assignee: 'Kith Annsreng',
@@ -171,8 +222,8 @@ const GANTT_TASKS: GanttTask[] = [
     deliverables: 'Attendance Punching, Punctuality Metrics, Hours Tracking'
   },
   {
-    id: 'TSK-12',
-    name: 'System Architecture & Budget Resources Review',
+    id: 'TSK-16',
+    name: 'RBAC Security Audit & Penetration Testing',
     phase: 'Phase 3: Integration & Testing',
     assignee: 'Leng Panhaleap',
     role: 'QA & Security Tester',
@@ -180,23 +231,11 @@ const GANTT_TASKS: GanttTask[] = [
     durationWeeks: 2,
     progress: 100,
     status: 'Completed',
-    deliverables: 'Infrastructure allocation review, cloud cost projection'
+    deliverables: 'Rate Limiting, XSS Sanitization, Privilege Escalation Audits'
   },
   {
-    id: 'TSK-13',
-    name: 'RBAC Security Audit & Labor Law Compliance',
-    phase: 'Phase 3: Integration & Testing',
-    assignee: 'Leng Panhaleap',
-    role: 'QA & Security Tester',
-    startWeek: 4,
-    durationWeeks: 2,
-    progress: 100,
-    status: 'Completed',
-    deliverables: 'Rate Limiting, XSS Sanitization, MoLVT Articles 166/182 tests'
-  },
-  {
-    id: 'TSK-14',
-    name: 'Executive Dashboard & Department Analytics Charts',
+    id: 'TSK-17',
+    name: 'Usability Testing & Accessibility Polish',
     phase: 'Phase 4: Finalization & UAT',
     assignee: 'Kim Menghorpisith',
     role: 'UI/UX Designer',
@@ -204,11 +243,13 @@ const GANTT_TASKS: GanttTask[] = [
     durationWeeks: 2,
     progress: 100,
     status: 'Completed',
-    deliverables: 'High-Contrast White Tooltips, Donut & Bar Charts, Cards'
+    deliverables: 'WCAG Contrast Verification, Mobile Viewport Polishing'
   },
+
+  // --- Phase 4: Finalization & University Defense (July W5 – W6) ---
   {
-    id: 'TSK-15',
-    name: 'PDF & Excel Reporting Engines (Client-Side Generators)',
+    id: 'TSK-18',
+    name: 'Client-Side PDF Payslip & Excel Export Generators',
     phase: 'Phase 4: Finalization & UAT',
     assignee: 'Kith Annsreng',
     role: 'Developer',
@@ -219,8 +260,20 @@ const GANTT_TASKS: GanttTask[] = [
     deliverables: 'Confidential Payslip PDFs, Roster & Payroll Excel Sheets'
   },
   {
-    id: 'TSK-16',
-    name: 'Risk Management, Testing & University Defense Sign-off',
+    id: 'TSK-19',
+    name: 'End-to-End User Acceptance Testing (UAT) & Performance',
+    phase: 'Phase 4: Finalization & UAT',
+    assignee: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
+    startWeek: 5,
+    durationWeeks: 2,
+    progress: 100,
+    status: 'Completed',
+    deliverables: 'UAT Sign-off Report, Sub-2s Latency Verification, Defect Logs'
+  },
+  {
+    id: 'TSK-20',
+    name: 'Project Defense Presentation & Demonstration Preparation',
     phase: 'Phase 4: Finalization & UAT',
     assignee: 'Kim Menghorpisith',
     role: 'UI/UX Designer',
@@ -228,7 +281,7 @@ const GANTT_TASKS: GanttTask[] = [
     durationWeeks: 2,
     progress: 100,
     status: 'Completed',
-    deliverables: 'Production Web App on Render, Defense Presentation, Sign-off'
+    deliverables: 'Defense Slide Deck, Architecture Diagrams, Live Demo Script'
   }
 ];
 
@@ -241,7 +294,7 @@ const TEAM_MEMBERS = [
     color: 'border-rose-500 bg-rose-50 text-rose-700',
     barColor: 'bg-[#e11d48]',
     tasksCount: 5,
-    hours: '350 - 500 hrs'
+    hours: '130 - 160 hrs'
   },
   {
     name: 'Kith Annsreng',
@@ -251,7 +304,7 @@ const TEAM_MEMBERS = [
     color: 'border-blue-500 bg-blue-50 text-blue-700',
     barColor: 'bg-[#2563eb]',
     tasksCount: 5,
-    hours: '300 - 450 hrs'
+    hours: '120 - 150 hrs'
   },
   {
     name: 'Leng Panhaleap',
@@ -260,8 +313,8 @@ const TEAM_MEMBERS = [
     quote: 'Test app and observe missing implementation.',
     color: 'border-emerald-500 bg-emerald-50 text-emerald-700',
     barColor: 'bg-[#16a34a]',
-    tasksCount: 3,
-    hours: '80 - 120 hrs'
+    tasksCount: 5,
+    hours: '90 - 120 hrs'
   },
   {
     name: 'Kim Menghorpisith',
@@ -270,50 +323,63 @@ const TEAM_MEMBERS = [
     quote: 'Functions over forms.',
     color: 'border-orange-500 bg-orange-50 text-orange-700',
     barColor: 'bg-[#ea580c]',
-    tasksCount: 3,
-    hours: '60 - 80 hrs'
+    tasksCount: 5,
+    hours: '90 - 110 hrs'
   }
 ];
 
-// Exact task breakdown from the user-uploaded 6-week timeline image
+// Balanced task breakdown across the 6-week timeline (June W1 – July W6)
 const IMAGE_MEMBER_TASKS = [
   {
     member: 'Choeng Dyne',
+    role: 'Full-Stack Lead / Problem-Solving',
     color: 'text-[#e11d48]',
     barColor: 'bg-[#e11d48]',
     tasks: [
-      { name: 'Requirements Gathering', start: 1, duration: 1 },
-      { name: 'Market Research', start: 1, duration: 2 },
-      { name: 'Goals & Objectives', start: 2, duration: 1 }
+      { name: 'Requirements Gathering & Proposal Spec', start: 1, duration: 2 },
+      { name: 'System Architecture & Relational ERD', start: 1, duration: 2 },
+      { name: 'Express REST API & Database Engine', start: 2, duration: 3 },
+      { name: 'Statutory Cambodian Payroll Engine', start: 3, duration: 3 },
+      { name: 'Leave Workflow & System Integration', start: 4, duration: 3 }
     ]
   },
   {
     member: 'Kith Annsreng',
+    role: 'Developer / Integration',
     color: 'text-[#2563eb]',
     barColor: 'bg-[#2563eb]',
     tasks: [
-      { name: 'Software Requirements', start: 2, duration: 3 },
-      { name: 'Project Scope', start: 3, duration: 2 },
-      { name: 'Technology Stack', start: 3, duration: 2 }
+      { name: 'Frontend Architecture & Setup', start: 1, duration: 2 },
+      { name: 'React + Vite Shell & RBAC Navigation', start: 2, duration: 3 },
+      { name: 'Employee Directory & MoLVT Permits', start: 3, duration: 3 },
+      { name: 'Attendance Clock & Punctuality Engine', start: 4, duration: 2 },
+      { name: 'Client-Side PDF & Excel Generators', start: 5, duration: 2 }
     ]
   },
   {
     member: 'Leng Panhaleap',
+    role: 'QA & Security Tester',
     color: 'text-[#16a34a]',
     barColor: 'bg-[#16a34a]',
     tasks: [
-      { name: 'System Architecture', start: 4, duration: 2 },
-      { name: 'Budget & Resources', start: 4, duration: 2 }
+      { name: 'QA Test Strategy & Compliance Criteria', start: 1, duration: 2 },
+      { name: 'Database & REST API Functional Testing', start: 2, duration: 3 },
+      { name: 'Cambodian Labor Law Compliance Check', start: 3, duration: 3 },
+      { name: 'RBAC Security Audit & Penetration Tests', start: 4, duration: 2 },
+      { name: 'End-to-End UAT & Defense Sign-off', start: 5, duration: 2 }
     ]
   },
   {
     member: 'Kim Menghorpisith',
+    role: 'UI/UX Designer',
     color: 'text-[#ea580c]',
     barColor: 'bg-[#ea580c]',
     tasks: [
-      { name: 'Risk Management', start: 5, duration: 2 },
-      { name: 'Testing & Quality Assurance', start: 5, duration: 2 },
-      { name: 'Final Presentation & University Defense', start: 6, duration: 1 }
+      { name: 'UI/UX Design System & Figma Wireframes', start: 1, duration: 2 },
+      { name: 'High-Fidelity UI Prototypes & Tokens', start: 2, duration: 3 },
+      { name: 'Executive Dashboard & Analytics Visuals', start: 3, duration: 3 },
+      { name: 'Usability Testing & Accessibility Polish', start: 4, duration: 2 },
+      { name: 'Defense Presentation Slides & Demo Deck', start: 5, duration: 2 }
     ]
   }
 ];
@@ -475,7 +541,7 @@ export const ArchitectureViewer: React.FC = () => {
                 <span>Parent Entity</span>
               </div>
               <div className="p-4 text-xs font-mono space-y-1.5 text-slate-700">
-                <div>🔑 <strong>id</strong>: VARCHAR(20) [PK]</div>
+                <div><span className="text-emerald-700 font-bold">PK</span> <strong>id</strong>: VARCHAR(20)</div>
                 <div>firstName: VARCHAR(100)</div>
                 <div>lastName: VARCHAR(100)</div>
                 <div>email: VARCHAR(150) [UNIQUE]</div>
@@ -496,8 +562,8 @@ export const ArchitectureViewer: React.FC = () => {
                 <span>1 : N to Employee</span>
               </div>
               <div className="p-4 text-xs font-mono space-y-1.5 text-slate-700">
-                <div>🔑 <strong>id</strong>: VARCHAR(20) [PK]</div>
-                <div>🔗 <strong>employeeId</strong>: VARCHAR(20) [FK]</div>
+                <div><span className="text-blue-700 font-bold">PK</span> <strong>id</strong>: VARCHAR(20)</div>
+                <div><span className="text-slate-500 font-bold">FK</span> <strong>employeeId</strong>: VARCHAR(20)</div>
                 <div>leaveType: VARCHAR(50)</div>
                 <div>startDate: DATE</div>
                 <div>endDate: DATE</div>
@@ -516,9 +582,9 @@ export const ArchitectureViewer: React.FC = () => {
                 <span>1 : N to PayrollRun</span>
               </div>
               <div className="p-4 text-xs font-mono space-y-1.5 text-slate-700">
-                <div>🔑 <strong>id</strong>: VARCHAR(20) [PK]</div>
-                <div>🔗 <strong>payrollRunId</strong>: VARCHAR(20) [FK]</div>
-                <div>🔗 <strong>employeeId</strong>: VARCHAR(20) [FK]</div>
+                <div><span className="text-purple-700 font-bold">PK</span> <strong>id</strong>: VARCHAR(20)</div>
+                <div><span className="text-slate-500 font-bold">FK</span> <strong>payrollRunId</strong>: VARCHAR(20)</div>
+                <div><span className="text-slate-500 font-bold">FK</span> <strong>employeeId</strong>: VARCHAR(20)</div>
                 <div>baseSalary: DECIMAL(10,2)</div>
                 <div>allowances: DECIMAL(10,2)</div>
                 <div>overtimePay: DECIMAL(10,2)</div>
@@ -592,7 +658,7 @@ export const ArchitectureViewer: React.FC = () => {
                 <div className="text-[11px] text-slate-400 mt-2 italic line-clamp-2">“{m.quote}”</div>
                 <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
                   <span>{m.email}</span>
-                  <span className="text-emerald-600 font-bold">100% On-Track</span>
+                  <span className="text-emerald-600 font-bold">Completed</span>
                 </div>
               </div>
             ))}
@@ -624,7 +690,7 @@ export const ArchitectureViewer: React.FC = () => {
                       ganttViewType === 'detailed' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    15-Task Work Plan
+                    Detailed Work Plan
                   </button>
                   <button
                     onClick={() => setGanttViewType('image')}
@@ -742,7 +808,7 @@ export const ArchitectureViewer: React.FC = () => {
               </div>
             )}
 
-            {/* VIEW 2: COMPREHENSIVE 15-TASK WORK PLAN (The Old Distribution with June-July Timeline Dates) */}
+            {/* VIEW 2: COMPREHENSIVE WORK PLAN (Detailed 20 Tasks across June–July Timeline) */}
             {(ganttViewType === 'detailed' || ganttViewType === 'both') && (
               <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-xs bg-white">
                 <div className="min-w-[850px]">
@@ -763,7 +829,7 @@ export const ArchitectureViewer: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Task Rows (The 15 Tasks) */}
+                  {/* Task Rows (20 Tasks across all 4 Roles) */}
                   <div className="divide-y divide-slate-100">
                     {GANTT_TASKS.filter(t => selectedAssignee === 'All' || t.assignee === selectedAssignee || t.assignee === 'All Members').map(task => {
                       const member = TEAM_MEMBERS.find(m => m.name === task.assignee);
@@ -782,9 +848,6 @@ export const ArchitectureViewer: React.FC = () => {
                                 <span className="text-slate-400 font-mono text-[10px] mr-1">{task.id}</span>
                                 {task.name}
                               </span>
-                              <span className="text-[9px] font-mono text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0 ml-1">
-                                ✓ 100%
-                              </span>
                             </div>
                             <div className="flex items-center gap-2 text-[10px] text-slate-500">
                               <span className={`font-semibold ${member ? member.color.replace('border-', 'text-').replace('bg-', '') : 'text-slate-700'}`}>
@@ -796,7 +859,7 @@ export const ArchitectureViewer: React.FC = () => {
                               </span>
                             </div>
                             <div className="text-[10px] text-slate-400 truncate">
-                              🎯 {task.deliverables}
+                              <span className="text-slate-500">Deliverable:</span> {task.deliverables}
                             </div>
                           </div>
 
