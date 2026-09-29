@@ -15,7 +15,11 @@ import {
   Calendar,
   Users,
   Clock,
-  Sparkles
+  Sparkles,
+  Fingerprint,
+  Smartphone,
+  RefreshCw,
+  Milestone
 } from 'lucide-react';
 
 interface GanttTask {
@@ -684,6 +688,136 @@ export const ArchitectureViewer: React.FC = () => {
                 </div>
                 <div className="text-slate-500 text-[11px]">Render cloud deployment, automated PDF/Excel reports, and final university defense.</div>
                 <div className="text-emerald-700 font-semibold text-[10px]">Status: Production Ready (Render)</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 14: Future Plan & Multi-Phase Implementation Roadmap */}
+          <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/80 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 bg-blue-50 text-blue-800 text-xs font-bold rounded-full border border-blue-300">
+                    Post-MVP Horizon 2027
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">Proposal Section 14</span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mt-1">Future Plan & Implementation Roadmap</h3>
+                <p className="text-xs text-slate-500">
+                  Phased rollout milestones expanding ElevateHR beyond MVP into enterprise hardware & mobile apps
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-xs">
+              {/* Phase 1 */}
+              <div className="p-4 rounded-2xl border-2 border-emerald-500/40 bg-emerald-50/20 space-y-2 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                      Phase 1
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-600 font-bold">Q4 2026 - Q1 2027</span>
+                  </div>
+                  <div className="font-extrabold text-slate-900 mt-2 text-sm flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>MVP Core Stabilization</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1">
+                    Leave tracking, statutory Cambodian payroll engine, attendance punch clock, and role-based portals.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-emerald-200/60 font-semibold text-[10px] text-emerald-700">
+                  ● Status: Active / Live on Render
+                </div>
+              </div>
+
+              {/* Phase 2 */}
+              <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 flex flex-col justify-between hover:border-blue-400 transition-all">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                      Phase 2
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">Q1 2027</span>
+                  </div>
+                  <div className="font-extrabold text-slate-900 mt-2 text-sm flex items-center gap-1.5">
+                    <Fingerprint className="w-4 h-4 text-blue-600" />
+                    <span>Hardware Biometrics</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1">
+                    Single-location optical/capacitive fingerprint scanner pilot integration for anti-buddy punching.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-100 font-semibold text-[10px] text-blue-600">
+                  ○ Status: Planned Architecture
+                </div>
+              </div>
+
+              {/* Phase 3 */}
+              <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 flex flex-col justify-between hover:border-indigo-400 transition-all">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                      Phase 3
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">Q2 2027</span>
+                  </div>
+                  <div className="font-extrabold text-slate-900 mt-2 text-sm flex items-center gap-1.5">
+                    <RefreshCw className="w-4 h-4 text-indigo-600" />
+                    <span>Biometric Rollout</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1">
+                    Multi-branch fingerprint biometric hardware synchronization with centralized cloud punch logs.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-100 font-semibold text-[10px] text-indigo-600">
+                  ○ Status: Planned Scaling
+                </div>
+              </div>
+
+              {/* Phase 4 */}
+              <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 flex flex-col justify-between hover:border-amber-400 transition-all">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      Phase 4
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">Q3 2027</span>
+                  </div>
+                  <div className="font-extrabold text-slate-900 mt-2 text-sm flex items-center gap-1.5">
+                    <Milestone className="w-4 h-4 text-amber-600" />
+                    <span>Accounting Sync</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1">
+                    Two-way automated journal ledger sync with QuickBooks, Xero, and local tax compliance software.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-100 font-semibold text-[10px] text-amber-600">
+                  ○ Status: Planned Integration
+                </div>
+              </div>
+
+              {/* Phase 5 */}
+              <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 flex flex-col justify-between hover:border-purple-400 transition-all">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                      Phase 5
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">Q4 2027</span>
+                  </div>
+                  <div className="font-extrabold text-slate-900 mt-2 text-sm flex items-center gap-1.5">
+                    <Smartphone className="w-4 h-4 text-purple-600" />
+                    <span>Native Mobile App</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1">
+                    Dedicated iOS and Android Employee Self-Service applications with push notifications and GPS clock-in.
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-100 font-semibold text-[10px] text-purple-600">
+                  ○ Status: Planned Mobile
+                </div>
               </div>
             </div>
           </div>
