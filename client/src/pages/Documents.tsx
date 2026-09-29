@@ -33,7 +33,8 @@ export const Documents: React.FC = () => {
     docType: 'NSSF Card',
     fileName: '',
     fileSize: '1.4 MB',
-    category: 'Identification'
+    category: 'Identification',
+    fileData: ''
   });
 
   const fetchDocuments = async () => {
@@ -69,6 +70,24 @@ export const Documents: React.FC = () => {
     }
   };
 
+  const handleDownload = (doc: DocumentItem) => {
+    if (doc.fileData) {
+      const link = document.createElement('a');
+      link.href = doc.fileData;
+      link.download = doc.fileName;
+      link.click();
+    } else {
+      const content = `ELEVATE HR ENTERPRISE COMPLIANCE ARCHIVE\n=========================================\nDocument ID: ${doc.id}\nDocument Type: ${doc.docType}\nFile Name: ${doc.fileName}\nEmployee: ${doc.employeeName} (${doc.employeeId})\nCategory: ${doc.category}\nStatus: ${doc.status}\nVerified By: ${doc.verifiedBy || 'Pending'}\nUploaded Date: ${doc.uploadedAt}\n`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = doc.fileName.endsWith('.txt') ? doc.fileName : `${doc.fileName}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -77,6 +96,14 @@ export const Documents: React.FC = () => {
         fileName: uploadData.fileName || `${uploadData.docType.replace(/\s+/g, '_')}.pdf`
       });
       setIsUploadModalOpen(false);
+      setUploadData({
+        employeeId: employees[0]?.id || '',
+        docType: 'NSSF Card',
+        fileName: '',
+        fileSize: '1.4 MB',
+        category: 'Identification',
+        fileData: ''
+      });
       fetchDocuments();
     } catch (err) {
       console.error('Failed to upload document:', err);
@@ -215,11 +242,11 @@ export const Documents: React.FC = () => {
                     </>
                   )}
                   <button
-                    onClick={() => alert(`Simulating download for ${doc.fileName}`)}
-                    className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"
+                    onClick={() => handleDownload(doc)}
+                    className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
                     title="Download document file"
                   >
-                    <Download className="w-4 h-4" />
+                    <Download className="w-4 h-4 text-emerald-600" />
                   </button>
                 </div>
               </div>
@@ -286,7 +313,30 @@ export const Documents: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Document File Name *</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Choose File (.pdf, .jpg, .png)</label>
+            <input
+              type="file"
+              accept=".pdf,image/*,.docx,.xlsx"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                  setUploadData(prev => ({
+                    ...prev,
+                    fileName: file.name,
+                    fileData: reader.result as string,
+                    fileSize: file.size > 1024 * 1024 ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`
+                  }));
+                };
+                reader.readAsDataURL(file);
+              }}
+              className="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Document Display Name *</label>
             <input
               required
               type="text"

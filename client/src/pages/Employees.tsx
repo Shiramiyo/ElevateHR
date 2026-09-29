@@ -32,6 +32,7 @@ import { Employee, WorkPermitStatus } from '../types';
 import { api } from '../services/api';
 import { exportService } from '../services/exportService';
 import { pdfService } from '../services/pdfService';
+import { compressAndValidateImage } from '../services/imageUtils';
 
 const PRESET_AVATARS = [
   { label: 'Female 1 (Sophea)', url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80' },
@@ -159,7 +160,7 @@ export const Employees: React.FC = () => {
       address: 'Phnom Penh, Cambodia',
       bankName: 'ABA Bank',
       bankAccountNumber: `00${Math.floor(1000000 + Math.random() * 9000000)}`,
-      avatar: PRESET_AVATARS[0].url,
+      avatar: '',
       nationality: 'Cambodian',
       isForeignWorker: false,
       passportNumber: '',
@@ -184,20 +185,16 @@ export const Employees: React.FC = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Photo size must be less than 5MB');
-      return;
+    try {
+      const compressedDataUrl = await compressAndValidateImage(file);
+      setFormData(prev => ({ ...prev, avatar: compressedDataUrl }));
+    } catch (err: any) {
+      alert(err.message || 'Image processing failed');
     }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFormData(prev => ({ ...prev, avatar: reader.result as string }));
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleNationalityChange = (nat: string) => {
@@ -211,8 +208,25 @@ export const Employees: React.FC = () => {
     }));
   };
 
+  const validateWorkerCompliance = (): boolean => {
+    if (formData.isForeignWorker) {
+      if (!formData.workPermitNumber?.trim()) {
+        alert('Work permit number is required for foreign workers under Cambodia MoLVT regulations.');
+        return false;
+      }
+      if (formData.workPermitIssueDate && formData.workPermitExpiryDate) {
+        if (new Date(formData.workPermitExpiryDate) <= new Date(formData.workPermitIssueDate)) {
+          alert('Work permit expiry date must be strictly after the issue date.');
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
   const handleSaveAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateWorkerCompliance()) return;
     try {
       await api.createEmployee(formData);
       setIsAddModalOpen(false);
@@ -225,6 +239,7 @@ export const Employees: React.FC = () => {
   const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeEmployee) return;
+    if (!validateWorkerCompliance()) return;
     try {
       await api.updateEmployee(activeEmployee.id, formData);
       setIsEditModalOpen(false);
@@ -755,6 +770,15 @@ export const Employees: React.FC = () => {
                   />
                 </div>
                 <div>
+                  <label className="block text-[11px] font-semibold text-blue-950 mb-1">Work Permit Issue Date</label>
+                  <input
+                    type="date"
+                    value={formData.workPermitIssueDate || ''}
+                    onChange={e => setFormData({ ...formData, workPermitIssueDate: e.target.value })}
+                    className="w-full px-3 py-1.5 bg-white border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div>
                   <label className="block text-[11px] font-semibold text-blue-950 mb-1">Work Permit Expiry Date *</label>
                   <input
                     type="date"
@@ -762,6 +786,35 @@ export const Employees: React.FC = () => {
                     onChange={e => setFormData({ ...formData, workPermitExpiryDate: e.target.value })}
                     className="w-full px-3 py-1.5 bg-white border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[11px] font-semibold text-blue-950 mb-1">MoLVT Work Permit Card Scan (.pdf, .jpg, .png)</label>
+                  <input
+                    type="file"
+                    accept=".pdf,image/*"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setFormData(prev => ({
+                          ...prev,
+                          workPermitDocument: {
+                            fileName: file.name,
+                            fileData: reader.result as string,
+                            fileSize: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                          } as any
+                        }));
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+                  />
+                  {(formData as any).workPermitDocument?.fileName && (
+                    <span className="text-[11px] text-emerald-700 font-semibold mt-1 inline-block">
+                      ✓ Attached: {(formData as any).workPermitDocument.fileName}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1021,6 +1074,15 @@ export const Employees: React.FC = () => {
                   />
                 </div>
                 <div>
+                  <label className="block text-[11px] font-semibold text-blue-950 mb-1">Work Permit Issue Date</label>
+                  <input
+                    type="date"
+                    value={formData.workPermitIssueDate || ''}
+                    onChange={e => setFormData({ ...formData, workPermitIssueDate: e.target.value })}
+                    className="w-full px-3 py-1.5 bg-white border border-blue-200 rounded-xl"
+                  />
+                </div>
+                <div>
                   <label className="block text-[11px] font-semibold text-blue-950 mb-1">Work Permit Expiry Date</label>
                   <input
                     type="date"
@@ -1028,6 +1090,35 @@ export const Employees: React.FC = () => {
                     onChange={e => setFormData({ ...formData, workPermitExpiryDate: e.target.value })}
                     className="w-full px-3 py-1.5 bg-white border border-blue-200 rounded-xl"
                   />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[11px] font-semibold text-blue-950 mb-1">MoLVT Work Permit Card Scan (.pdf, .jpg, .png)</label>
+                  <input
+                    type="file"
+                    accept=".pdf,image/*"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setFormData(prev => ({
+                          ...prev,
+                          workPermitDocument: {
+                            fileName: file.name,
+                            fileData: reader.result as string,
+                            fileSize: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                          } as any
+                        }));
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="w-full text-xs text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+                  />
+                  {(formData as any).workPermitDocument?.fileName && (
+                    <span className="text-[11px] text-emerald-700 font-semibold mt-1 inline-block">
+                      ✓ Attached: {(formData as any).workPermitDocument.fileName}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

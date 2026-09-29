@@ -47,6 +47,11 @@ export const Reports: React.FC = () => {
   }, []);
 
   const latestRun = payrollRuns[0];
+  const approvedLeavesCount = leaves.filter(l => l.status === 'Approved').length;
+  const leaveApprovalRate = leaves.length > 0 ? `${((approvedLeavesCount / leaves.length) * 100).toFixed(0)}% Approved` : '100% Approved';
+
+  const onTimeAttendance = attendance.filter(a => a.status === 'Present').length;
+  const punctualityRate = attendance.length > 0 ? `${((onTimeAttendance / attendance.length) * 100).toFixed(1)}% On-time` : '100.0% On-time';
 
   return (
     <div className="space-y-6 pb-12">
@@ -166,7 +171,7 @@ export const Reports: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span>Approval Rate:</span>
-                <span className="font-bold text-blue-600">80% Approved</span>
+                <span className="font-bold text-blue-600">{leaveApprovalRate}</span>
               </div>
             </div>
           </div>
@@ -205,7 +210,7 @@ export const Reports: React.FC = () => {
             <div className="mt-4 p-3 bg-slate-50 rounded-xl text-xs space-y-1.5 text-slate-600">
               <div className="flex justify-between">
                 <span>Punctuality Benchmark:</span>
-                <span className="font-bold text-slate-900">98.4% On-time</span>
+                <span className="font-bold text-slate-900">{punctualityRate}</span>
               </div>
               <div className="flex justify-between">
                 <span>Standard Shift:</span>

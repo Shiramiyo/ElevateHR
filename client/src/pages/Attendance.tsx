@@ -44,6 +44,9 @@ export const Attendance: React.FC = () => {
 
   const presentCount = records.filter(r => r.status === 'Present').length;
   const lateCount = records.filter(r => r.status === 'Late').length;
+  const attendanceRate = records.length > 0
+    ? (((presentCount + lateCount) / records.length) * 100).toFixed(1) + '%'
+    : '100.0%';
 
   return (
     <div className="space-y-6 pb-12">
@@ -97,8 +100,8 @@ export const Attendance: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-semibold text-slate-400 uppercase">Attendance Rate</div>
-            <div className="text-2xl font-extrabold text-blue-600">98.4%</div>
-            <div className="text-[11px] text-slate-500">Above corporate target (95%)</div>
+            <div className="text-2xl font-extrabold text-blue-600">{attendanceRate}</div>
+            <div className="text-[11px] text-slate-500">Based on active day logs</div>
           </div>
         </div>
       </div>
@@ -117,12 +120,25 @@ export const Attendance: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-semibold text-slate-500">Select Date:</span>
+          <button
+            type="button"
+            onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+            className="px-2.5 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+          >
+            Today
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedDate('2026-08-24')}
+            className="px-2.5 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+          >
+            Demo Day
+          </button>
           <input
             type="date"
             value={selectedDate}
             onChange={e => setSelectedDate(e.target.value)}
-            className="px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none"
+            className="px-3 py-1.5 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none"
           />
         </div>
       </div>

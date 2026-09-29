@@ -10,20 +10,24 @@ import { Attendance } from './pages/Attendance';
 import { Documents } from './pages/Documents';
 import { Reports } from './pages/Reports';
 import { EmployeePortal } from './pages/EmployeePortal';
+import { ArchitectureViewer } from './pages/ArchitectureViewer';
+import { Login } from './pages/Login';
 import { api } from './services/api';
 
 const AppContent: React.FC = () => {
-  const { role } = useAuth();
+  const { role, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [pendingLeavesCount, setPendingLeavesCount] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
-  // Auto adjust tab when switching to employee role
+  // Auto adjust tab when switching roles
   useEffect(() => {
     if (role === 'employee' && activeTab !== 'portal') {
       setActiveTab('portal');
+    } else if (role === 'manager' && (activeTab === 'payroll' || activeTab === 'architecture')) {
+      setActiveTab('dashboard');
     }
-  }, [role]);
+  }, [role, activeTab]);
 
   const loadPendingCount = async () => {
     try {
@@ -58,10 +62,16 @@ const AppContent: React.FC = () => {
         return <Reports />;
       case 'portal':
         return <EmployeePortal />;
+      case 'architecture':
+        return <ArchitectureViewer />;
       default:
         return <Dashboard onNavigate={setActiveTab} />;
     }
   };
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
 
   return (
     <div className="flex h-screen w-screen bg-slate-50 overflow-hidden font-['Plus_Jakarta_Sans',sans-serif]">

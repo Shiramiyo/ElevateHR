@@ -160,6 +160,7 @@ export interface DocumentItem {
     | 'Other Document';
   fileName: string;
   fileSize: string;
+  fileData?: string;
   uploadedAt: string;
   status: 'Verified' | 'Pending Verification' | 'Rejected';
   verifiedBy: string | null;

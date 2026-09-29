@@ -31,6 +31,58 @@ import { api } from '../services/api';
 
 const COLORS = ['#2563eb', '#0f766e', '#b45309', '#6366f1', '#475569', '#be185d'];
 
+const CustomPieTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <div
+        className="bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 rounded-xl shadow-2xl border border-slate-700/80 pointer-events-none z-50 text-left min-w-[140px]"
+        style={{ color: '#ffffff', backgroundColor: '#0f172a' }}
+      >
+        <div className="font-bold text-xs flex items-center gap-2" style={{ color: '#ffffff' }}>
+          <span
+            className="w-2.5 h-2.5 rounded-full inline-block shrink-0 shadow-xs"
+            style={{ backgroundColor: data.payload.fill || data.color }}
+          />
+          <span style={{ color: '#ffffff', fontWeight: 700 }}>{data.name}</span>
+        </div>
+        <div className="text-xs mt-1.5 flex items-baseline gap-1" style={{ color: '#ffffff' }}>
+          <span className="font-black text-white" style={{ color: '#ffffff', fontSize: '14px' }}>
+            {data.value}
+          </span>
+          <span style={{ color: '#cbd5e1', fontSize: '11px' }}>
+            {data.value === 1 ? 'Employee' : 'Employees'}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomBarTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <div
+        className="bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 rounded-xl shadow-2xl border border-slate-700/80 pointer-events-none z-50 text-left"
+        style={{ color: '#ffffff', backgroundColor: '#0f172a' }}
+      >
+        <div className="text-[11px] font-semibold" style={{ color: '#cbd5e1' }}>
+          Month: <span style={{ color: '#ffffff', fontWeight: 700 }}>{label}</span>
+        </div>
+        <div className="text-xs font-bold mt-1 flex items-center gap-1.5" style={{ color: '#ffffff' }}>
+          <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+          <span style={{ color: '#ffffff' }}>Expenditure:</span>
+          <span className="font-black text-emerald-400" style={{ color: '#34d399', fontWeight: 800 }}>
+            ${Number(data.value).toLocaleString()}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 interface DashboardProps {
   onNavigate: (tab: string) => void;
@@ -177,10 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   tick={{ fill: '#64748b', fontSize: 12 }}
                   tickFormatter={val => `$${val}`}
                 />
-                <Tooltip
-                  formatter={(val: any) => [`$${Number(val).toLocaleString()}`, 'Expenditure']}
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', color: '#fff' }}
-                />
+                <Tooltip content={<CustomBarTooltip />} wrapperStyle={{ outline: 'none' }} />
                 <Bar dataKey="amount" fill="#2563eb" radius={[4, 4, 0, 0]} />
 
               </BarChart>
@@ -194,7 +243,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <h3 className="text-base font-bold text-slate-900">Department Distribution</h3>
             <p className="text-xs text-slate-500 mb-4">Workforce allocation by business unit</p>
             
-            <div className="h-48">
+            <div className="relative h-48 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -205,18 +254,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     cy="50%"
                     innerRadius={45}
                     outerRadius={75}
-                    paddingAngle={4}
+                    paddingAngle={3}
                   >
                     {stats.departmentBreakdown.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    formatter={(val: any, name: any) => [`${val} Employees`, name]}
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', color: '#fff' }}
-                  />
+                  <Tooltip content={<CustomPieTooltip />} wrapperStyle={{ outline: 'none' }} />
                 </PieChart>
               </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-xl font-extrabold text-slate-900 leading-tight">{stats.totalEmployees}</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Staff</span>
+              </div>
             </div>
           </div>
 

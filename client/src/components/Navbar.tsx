@@ -21,7 +21,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu }) => {
-  const { currentUser, role, switchUser, isClockedIn, setIsClockedIn, clockInTime, setClockInTime } = useAuth();
+  const { currentUser, role, switchUser, isClockedIn, setIsClockedIn, clockInTime, setClockInTime, logout } = useAuth();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [employeesList, setEmployeesList] = useState<Employee[]>([]);
@@ -75,7 +75,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
           </button>
         )}
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
+          <img src="/ElevateHR.png" alt="ElevateHR" className="w-7 h-7 object-contain rounded-md" />
           <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
             ElevateHR Platform
           </span>
@@ -198,6 +199,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onRefreshAll, onToggleMobileMenu
                 ) : (
                   <div className="p-4 text-center text-xs text-slate-400">Loading profiles...</div>
                 )}
+              </div>
+
+              <div className="p-2 border-t border-slate-100 bg-slate-50/70 rounded-b-xl">
+                <button
+                  onClick={() => {
+                    setShowRoleMenu(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors border border-rose-200/60"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out / Switch Persona</span>
+                </button>
               </div>
             </div>
           )}

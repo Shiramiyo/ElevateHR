@@ -53,10 +53,12 @@ export const Login: React.FC = () => {
 
       <div className="w-full max-w-md space-y-6 z-10">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white font-black text-2xl shadow-xl shadow-emerald-500/20 mb-2">
-            E
-          </div>
+        <div className="text-center space-y-2 flex flex-col items-center">
+          <img
+            src="/ElevateHR.png"
+            alt="ElevateHR Logo"
+            className="w-16 h-16 object-contain rounded-2xl mb-1 shadow-lg shadow-emerald-500/20"
+          />
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Elevate<span className="text-emerald-400">HR</span>
           </h1>
@@ -175,7 +177,7 @@ export const Login: React.FC = () => {
             </button>
 
             <button
-              onClick={() => handleQuick('EHR-1003')}
+              onClick={() => handleQuick('EHR-1005')}
               disabled={loading}
               className="w-full text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/40 transition-all flex items-center justify-between group"
             >

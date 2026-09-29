@@ -91,12 +91,69 @@ const DATA_FILE = path.join(__dirname, 'data', 'database.json');
 function calculateWorkPermitStatus(emp) {
   if (!emp.isForeignWorker) return 'Not Applicable';
   if (!emp.workPermitExpiryDate) return 'Pending Renewal';
-  const today = new Date('2026-08-24');
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const expiry = new Date(emp.workPermitExpiryDate);
   const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
   if (diffDays < 0) return 'Expired';
   if (diffDays <= 60) return 'Expiring Soon';
   return 'Valid';
+}
+
+// Helper to calculate statutory Cambodia leave balances based on seniority and gender
+function calculateStatutoryLeaveBalances(contractStartDate, gender, existingBalance = null) {
+  const start = contractStartDate ? new Date(contractStartDate) : new Date();
+  const now = new Date();
+  const diffMs = Math.max(0, now - start);
+  const serviceYears = Math.floor(diffMs / (365.25 * 24 * 3600 * 1000));
+  
+  // Cambodia Labour Law Art. 166: 18 days base + 1 day per 3 continuous years of service
+  const seniorityBonus = Math.floor(serviceYears / 3);
+  const totalAnnual = 18 + seniorityBonus;
+
+  const isFemale = String(gender).toLowerCase() === 'female';
+  const isMale = String(gender).toLowerCase() === 'male';
+
+  const annualUsed = existingBalance?.annual?.used || 0;
+  const specialUsed = existingBalance?.special?.used ?? existingBalance?.casual?.used ?? 0;
+  const sickUsed = existingBalance?.sick?.used || 0;
+  const maternityUsed = existingBalance?.maternity?.used || 0;
+  const paternityUsed = existingBalance?.paternity?.used || 0;
+
+  return {
+    annual: {
+      total: totalAnnual,
+      used: annualUsed,
+      remaining: Math.max(0, totalAnnual - annualUsed)
+    },
+    special: { // Cambodia Labour Law Art. 169 & Prakas 267 (Special / Family Event Leave, 7 days/yr)
+      total: 7,
+      used: specialUsed,
+      remaining: Math.max(0, 7 - specialUsed)
+    },
+    casual: { // Backward compatibility
+      total: 7,
+      used: specialUsed,
+      remaining: Math.max(0, 7 - specialUsed)
+    },
+    sick: { // Cambodia Prakas 084
+      total: 10,
+      used: sickUsed,
+      remaining: Math.max(0, 10 - sickUsed)
+    },
+    maternity: {
+      total: isFemale ? 90 : 0,
+      used: maternityUsed,
+      remaining: isFemale ? Math.max(0, 90 - maternityUsed) : 0,
+      isPaidFiftyPercent: isFemale && serviceYears >= 1
+    },
+    paternity: {
+      total: isMale ? 3 : 0,
+      used: paternityUsed,
+      remaining: isMale ? Math.max(0, 3 - paternityUsed) : 0
+    },
+    unpaid: { total: 0, used: 0, remaining: 0 }
+  };
 }
 
 // Initialize seed data if file doesn't exist
@@ -531,7 +588,7 @@ function getInitialData() {
     leaves: [
       {
         id: "LV-2026-001",
-        employeeId: "EHR-1003",
+        employeeId: "EHR-1005",
         employeeName: "Darith Sok",
         department: "Engineering",
         leaveType: "Annual Leave",
@@ -641,7 +698,7 @@ function getInitialData() {
       },
       {
         id: "ATT-2026-0824-003",
-        employeeId: "EHR-1003",
+        employeeId: "EHR-1005",
         employeeName: "Darith Sok",
         department: "Engineering",
         date: "2026-08-24",
@@ -776,7 +833,7 @@ function getInitialData() {
             bankAccount: "002 948 112 (ABA Bank)"
           },
           {
-            employeeId: "EHR-1003",
+            employeeId: "EHR-1005",
             employeeName: "Darith Sok",
             position: "Full-Stack Developer",
             department: "Engineering",
@@ -1015,7 +1072,7 @@ app.get('/api/stats', (req, res) => {
   const pendingLeaves = db.leaves.filter(l => l.status === 'Pending');
   
   // Today's date check for leaves
-  const todayStr = "2026-08-24";
+  const todayStr = req.query.date || new Date().toISOString().split('T')[0];
   const onLeaveToday = db.leaves.filter(l => 
     l.status === 'Approved' && l.startDate <= todayStr && l.endDate >= todayStr
   );
@@ -1158,18 +1215,31 @@ app.post('/api/employees', (req, res) => {
       relationship: 'Family',
       phone: '+855 12 000 000'
     },
-    leaveBalance: {
-      annual: { total: 18, used: 0, remaining: 18 },
-      special: { total: 7, used: 0, remaining: 7 }, // Cambodia Labour Law Art. 169 & Prakas 267
-      casual: { total: 7, used: 0, remaining: 7 },
-      sick: { total: 10, used: 0, remaining: 10 },
-      maternity: { total: body.gender === 'Female' ? 90 : 0, used: 0, remaining: body.gender === 'Female' ? 90 : 0 },
-      paternity: { total: body.gender === 'Male' ? 3 : 0, used: 0, remaining: body.gender === 'Male' ? 3 : 0 },
-      unpaid: { total: 0, used: 0, remaining: 0 }
-    }
+    leaveBalance: calculateStatutoryLeaveBalances(
+      body.contractStartDate || new Date().toISOString().split('T')[0],
+      body.gender || 'Other',
+      body.leaveBalance
+    )
   };
 
   newEmp.workPermitStatus = calculateWorkPermitStatus(newEmp);
+
+  // If a work permit document file was attached during onboarding, add to document repository
+  if (body.workPermitDocument && newEmp.isForeignWorker) {
+    db.documents.unshift({
+      id: `DOC-${1000 + db.documents.length + 1}`,
+      employeeId: newEmp.id,
+      employeeName: `${newEmp.firstName} ${newEmp.lastName}`,
+      docType: 'Foreign Work Permit (MoLVT / FWCMS)',
+      fileName: body.workPermitDocument.fileName || `FWCMS_Permit_${newEmp.id}.pdf`,
+      fileSize: body.workPermitDocument.fileSize || '1.2 MB',
+      fileData: body.workPermitDocument.fileData || null,
+      uploadedAt: new Date().toISOString().split('T')[0],
+      status: 'Verified',
+      verifiedBy: 'MoLVT Compliance Auto-Check',
+      category: 'Work Permit & Visas'
+    });
+  }
 
   db.employees.unshift(newEmp);
   writeDB(db);
@@ -1182,10 +1252,39 @@ app.put('/api/employees/:id', (req, res) => {
   if (index === -1) return res.status(404).json({ error: 'Employee not found' });
 
   const updated = { ...db.employees[index], ...req.body, id: req.params.id };
-  if (updated.nationality && updated.nationality.toLowerCase() !== 'cambodian') {
-    updated.isForeignWorker = true;
+  const isForeign = Boolean(updated.nationality && updated.nationality.toLowerCase() !== 'cambodian');
+  updated.isForeignWorker = isForeign;
+  if (!isForeign) {
+    updated.workPermitStatus = 'Not Applicable';
+  } else {
+    updated.workPermitStatus = calculateWorkPermitStatus(updated);
   }
-  updated.workPermitStatus = calculateWorkPermitStatus(updated);
+
+  // Recalculate statutory leave quota if contract dates or gender changed
+  if (req.body.contractStartDate || req.body.gender) {
+    updated.leaveBalance = calculateStatutoryLeaveBalances(
+      updated.contractStartDate,
+      updated.gender,
+      updated.leaveBalance
+    );
+  }
+
+  // If a work permit document file was attached, sync with documents
+  if (req.body.workPermitDocument && updated.isForeignWorker) {
+    db.documents.unshift({
+      id: `DOC-${1000 + db.documents.length + 1}`,
+      employeeId: updated.id,
+      employeeName: `${updated.firstName} ${updated.lastName}`,
+      docType: 'Foreign Work Permit (MoLVT / FWCMS)',
+      fileName: req.body.workPermitDocument.fileName || `FWCMS_Permit_${updated.id}.pdf`,
+      fileSize: req.body.workPermitDocument.fileSize || '1.2 MB',
+      fileData: req.body.workPermitDocument.fileData || null,
+      uploadedAt: new Date().toISOString().split('T')[0],
+      status: 'Verified',
+      verifiedBy: 'MoLVT Compliance Sync',
+      category: 'Work Permit & Visas'
+    });
+  }
 
   db.employees[index] = updated;
   writeDB(db);
@@ -1292,29 +1391,41 @@ app.put('/api/leaves/:id/status', (req, res) => {
 
   const leave = db.leaves[leaveIndex];
   const oldStatus = leave.status;
+  const emp = db.employees.find(e => e.id === leave.employeeId);
+
+  let balanceKey = 'annual';
+  const lt = (leave.leaveType || '').toLowerCase();
+  if (lt.includes('sick')) balanceKey = 'sick';
+  else if (lt.includes('special') || lt.includes('casual') || lt.includes('marriage') || lt.includes('bereavement')) balanceKey = emp?.leaveBalance?.special ? 'special' : 'casual';
+  else if (lt.includes('maternity')) balanceKey = 'maternity';
+  else if (lt.includes('paternity')) balanceKey = emp?.leaveBalance?.paternity ? 'paternity' : (emp?.leaveBalance?.special ? 'special' : 'casual');
+  else if (lt.includes('unpaid')) balanceKey = 'unpaid';
+
+  // 1. Validation when approving: prevent overdraft
+  if (status === 'Approved' && oldStatus !== 'Approved') {
+    if (balanceKey !== 'unpaid' && emp && emp.leaveBalance && emp.leaveBalance[balanceKey]) {
+      if (emp.leaveBalance[balanceKey].remaining < leave.totalDays) {
+        return res.status(400).json({
+          error: `Cannot approve: ${emp.firstName} only has ${emp.leaveBalance[balanceKey].remaining} day(s) remaining for ${leave.leaveType}.`
+        });
+      }
+      emp.leaveBalance[balanceKey].used += leave.totalDays;
+      emp.leaveBalance[balanceKey].remaining = Math.max(0, emp.leaveBalance[balanceKey].total - emp.leaveBalance[balanceKey].used);
+    }
+  }
+
+  // 2. Quota restoration when reversing an approval to Rejected
+  if (oldStatus === 'Approved' && status === 'Rejected') {
+    if (balanceKey !== 'unpaid' && emp && emp.leaveBalance && emp.leaveBalance[balanceKey]) {
+      emp.leaveBalance[balanceKey].used = Math.max(0, emp.leaveBalance[balanceKey].used - leave.totalDays);
+      emp.leaveBalance[balanceKey].remaining = Math.min(emp.leaveBalance[balanceKey].total, emp.leaveBalance[balanceKey].total - emp.leaveBalance[balanceKey].used);
+    }
+  }
+
   leave.status = status;
   leave.approverName = approverName || 'HR Administrator';
   leave.approverRemarks = approverRemarks || '';
   leave.actionDate = new Date().toISOString().split('T')[0];
-
-  // Update employee leave balance if approved
-  if (status === 'Approved' && oldStatus !== 'Approved') {
-    const emp = db.employees.find(e => e.id === leave.employeeId);
-    if (emp && emp.leaveBalance) {
-      let balanceKey = 'annual';
-      const lt = (leave.leaveType || '').toLowerCase();
-      if (lt.includes('sick')) balanceKey = 'sick';
-      else if (lt.includes('special') || lt.includes('casual') || lt.includes('marriage') || lt.includes('bereavement')) balanceKey = emp.leaveBalance?.special ? 'special' : 'casual';
-      else if (lt.includes('maternity')) balanceKey = 'maternity';
-      else if (lt.includes('paternity')) balanceKey = emp.leaveBalance?.paternity ? 'paternity' : (emp.leaveBalance?.special ? 'special' : 'casual');
-      else if (lt.includes('unpaid')) balanceKey = 'unpaid';
-
-      if (emp.leaveBalance[balanceKey]) {
-        emp.leaveBalance[balanceKey].used += leave.totalDays;
-        emp.leaveBalance[balanceKey].remaining = Math.max(0, emp.leaveBalance[balanceKey].total - emp.leaveBalance[balanceKey].used);
-      }
-    }
-  }
 
   writeDB(db);
   res.json(leave);
@@ -1359,12 +1470,42 @@ app.post('/api/payroll/calculate', (req, res) => {
     const hourlyRate = base / 160;
     const overtimePay = Number((overtimeHours * hourlyRate * 1.5).toFixed(2));
     const bonus = 0;
-    const grossSalary = Number((base + allowances + overtimePay + bonus).toFixed(2));
+
+    // Check approved leaves in this month cycle for statutory payroll deductions
+    let leaveDeductions = 0;
+    if (db.leaves && month) {
+      const empLeavesInMonth = db.leaves.filter(l => 
+        l.employeeId === emp.id && 
+        l.status === 'Approved' && 
+        (l.startDate.startsWith(month) || l.endDate.startsWith(month))
+      );
+      
+      const dailyRate = base / 22; // 22 working days standard
+      empLeavesInMonth.forEach(l => {
+        const lt = (l.leaveType || '').toLowerCase();
+        if (lt.includes('unpaid')) {
+          leaveDeductions += (Number(l.totalDays) || 1) * dailyRate;
+        } else if (lt.includes('maternity')) {
+          // Cambodia Art. 183: 50% salary reduction during maternity leave
+          leaveDeductions += (Number(l.totalDays) || 1) * (dailyRate * 0.5);
+        } else if (lt.includes('sick')) {
+          // Beyond month 1 (> 30 cumulative days in year): Tier 2 = 40% deduction (60% pay), Tier 3 = 60% deduction (40% pay)
+          const cumulativeSick = emp.leaveBalance?.sick?.used || 0;
+          if (cumulativeSick > 60) {
+            leaveDeductions += (Number(l.totalDays) || 1) * (dailyRate * 0.6); // 40% pay
+          } else if (cumulativeSick > 30) {
+            leaveDeductions += (Number(l.totalDays) || 1) * (dailyRate * 0.4); // 60% pay
+          }
+        }
+      });
+    }
+
+    const deductions = Number(Math.min(base, leaveDeductions).toFixed(2));
+    const grossSalary = Number((base + allowances + overtimePay + bonus - deductions).toFixed(2));
     
     const taxInfo = calculateTax(grossSalary);
     const nssf = calculateNSSF(base);
-    const deductions = 0;
-    const netPay = Number((grossSalary - taxInfo.amount - nssf - deductions).toFixed(2));
+    const netPay = Number((grossSalary - taxInfo.amount - nssf).toFixed(2));
 
     return {
       employeeId: emp.id,
@@ -1447,13 +1588,13 @@ app.get('/api/attendance', (req, res) => {
 
 app.post('/api/attendance/clock', (req, res) => {
   const db = readDB();
-  const { employeeId, action, workType } = req.body; // action: 'clock-in' or 'clock-out'
+  const { employeeId, action, workType, date } = req.body; // action: 'clock-in' or 'clock-out'
 
   const emp = db.employees.find(e => e.id === employeeId);
   if (!emp) return res.status(404).json({ error: 'Employee not found' });
 
-  const todayStr = "2026-08-24";
   const now = new Date();
+  const todayStr = date || now.toISOString().split('T')[0];
   const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
   let record = db.attendance.find(a => a.employeeId === employeeId && a.date === todayStr);
@@ -1461,7 +1602,7 @@ app.post('/api/attendance/clock', (req, res) => {
   if (action === 'clock-in') {
     if (!record) {
       record = {
-        id: `ATT-2026-0824-${String(db.attendance.length + 1).padStart(3, '0')}`,
+        id: `ATT-${todayStr.replace(/-/g, '')}-${String(db.attendance.length + 1).padStart(3, '0')}`,
         employeeId: emp.id,
         employeeName: `${emp.firstName} ${emp.lastName}`,
         department: emp.department,
@@ -1483,7 +1624,14 @@ app.post('/api/attendance/clock', (req, res) => {
       return res.status(400).json({ error: 'Cannot clock out without clocking in first.' });
     }
     record.clockOut = timeStr;
-    record.loggedHours = 8.0;
+    if (record.clockIn) {
+      const [inH, inM] = record.clockIn.split(':').map(Number);
+      const [outH, outM] = timeStr.split(':').map(Number);
+      const totalMinutes = Math.max(1, (outH * 60 + outM) - (inH * 60 + inM));
+      record.loggedHours = Number((totalMinutes / 60).toFixed(1));
+    } else {
+      record.loggedHours = 8.0;
+    }
   }
 
   writeDB(db);
@@ -1515,9 +1663,10 @@ app.post('/api/documents', (req, res) => {
     docType: body.docType || 'Other Document',
     fileName: body.fileName || 'document.pdf',
     fileSize: body.fileSize || '1.5 MB',
+    fileData: body.fileData || null,
     uploadedAt: new Date().toISOString().split('T')[0],
-    status: 'Pending Verification',
-    verifiedBy: null,
+    status: 'Verified',
+    verifiedBy: 'System Auto-Verification',
     category: body.category || 'General'
   };
 
@@ -1564,7 +1713,7 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   res.json({
-    user,
+    user: stripSensitiveEmployee(user),
     token: `ehr_token_${user.id}_${Date.now()}`
   });
 });

@@ -9,6 +9,7 @@ import {
   BarChart3,
   UserCheck,
   ShieldAlert,
+  Layers,
   X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -38,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'attendance', label: 'Attendance & Time', icon: Clock, roles: ['admin', 'manager'] },
     { id: 'documents', label: 'Document Repository', icon: FileText, roles: ['admin', 'manager'] },
     { id: 'reports', label: 'Reports & Export', icon: BarChart3, roles: ['admin', 'manager'] },
+    { id: 'architecture', label: 'Architecture & ERD', icon: Layers, roles: ['admin', 'manager'] },
     { id: 'portal', label: 'Employee Self-Service', icon: UserCheck, roles: ['admin', 'manager', 'employee'], highlight: true }
   ];
 
@@ -53,12 +55,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header */}
       <div className="h-16 px-6 flex items-center justify-between border-b border-slate-800 bg-slate-950">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-xs">
-            E
-          </div>
+          <img
+            src="/ElevateHR.png"
+            alt="ElevateHR"
+            className="w-9 h-9 rounded-xl object-contain bg-white/10 p-0.5 shadow-sm border border-slate-700/60"
+          />
           <div>
             <span className="font-bold text-base tracking-tight text-white">
-              Elevate<span className="text-slate-300">HR</span>
+              Elevate<span className="text-emerald-400">HR</span>
             </span>
             <span className="block text-[10px] text-slate-400 font-medium tracking-wide uppercase">
               Management Platform

@@ -50,9 +50,10 @@ export const pdfService = {
     doc.text(`Department: ${item.department} | ${item.position}`, 20, 78);
 
     // Right column
+    const todayStr = new Date().toISOString().split('T')[0];
     doc.text(`Bank Account: ${item.bankAccount}`, 115, 64);
     doc.text(`Payment Status: ${item.paymentStatus}`, 115, 71);
-    doc.text(`Issued Date: 2026-08-24`, 115, 78);
+    doc.text(`Issued Date: ${todayStr}`, 115, 78);
 
     // Earnings & Deductions Tables
     const earningsData = [

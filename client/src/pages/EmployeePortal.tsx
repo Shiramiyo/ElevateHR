@@ -21,6 +21,7 @@ import { Modal } from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { pdfService } from '../services/pdfService';
+import { compressAndValidateImage } from '../services/imageUtils';
 import { LeaveRequest, PayrollRun, DocumentItem } from '../types';
 
 const PRESET_AVATARS = [
@@ -64,7 +65,9 @@ export const EmployeePortal: React.FC = () => {
   const [docUpload, setDocUpload] = useState({
     docType: 'NSSF Card',
     fileName: '',
-    category: 'Identification'
+    category: 'Identification',
+    fileData: '',
+    fileSize: ''
   });
 
   const loadPortalData = async () => {
@@ -133,6 +136,21 @@ export const EmployeePortal: React.FC = () => {
     }
   };
 
+  const handleDocFilePicked = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setDocUpload(prev => ({
+        ...prev,
+        fileName: file.name,
+        fileData: reader.result as string,
+        fileSize: file.size > 1024 * 1024 ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleUploadDoc = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -141,29 +159,46 @@ export const EmployeePortal: React.FC = () => {
         employeeId: currentUser.id,
         docType: docUpload.docType,
         fileName: docUpload.fileName || `${currentUser.firstName}_${docUpload.docType.replace(/\s+/g, '_')}.pdf`,
-        category: docUpload.category
+        category: docUpload.category,
+        fileData: docUpload.fileData,
+        fileSize: docUpload.fileSize || '1.2 MB'
       });
       setIsDocModalOpen(false);
+      setDocUpload({ docType: 'NSSF Card', fileName: '', category: 'Identification', fileData: '', fileSize: '' });
       loadPortalData();
     } catch (err) {
       console.error('Doc upload error:', err);
     }
   };
 
-  const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDownloadDoc = (doc: DocumentItem) => {
+    if (doc.fileData) {
+      const link = document.createElement('a');
+      link.href = doc.fileData;
+      link.download = doc.fileName;
+      link.click();
+    } else {
+      const content = `ELEVATE HR ENTERPRISE DOCUMENT\nDocument Type: ${doc.docType}\nFile Name: ${doc.fileName}\nEmployee: ${currentUser?.firstName} ${currentUser?.lastName} (${currentUser?.id})\nCategory: ${doc.category}\nStatus: ${doc.status}\nUploaded Date: ${doc.uploadedAt}\n`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = doc.fileName.endsWith('.txt') ? doc.fileName : `${doc.fileName}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleAvatarFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Photo size must be less than 5MB');
-      return;
+    try {
+      const compressed = await compressAndValidateImage(file);
+      setSelectedAvatar(compressed);
+    } catch (err: any) {
+      alert(err.message || 'Image processing failed');
     }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setSelectedAvatar(reader.result as string);
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleOpenAvatarModal = () => {
@@ -480,7 +515,15 @@ export const EmployeePortal: React.FC = () => {
               </div>
               <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
                 <span>{doc.uploadedAt}</span>
-                <span className="text-emerald-700 font-semibold">{doc.category}</span>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadDoc(doc)}
+                  className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-semibold"
+                  title="Download Document File"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download</span>
+                </button>
               </div>
             </div>
           ))}

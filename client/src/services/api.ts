@@ -168,7 +168,7 @@ export const api = {
     return res.json();
   },
 
-  async uploadDocument(data: { employeeId: string; docType: string; fileName: string; fileSize?: string; category?: string }): Promise<DocumentItem> {
+  async uploadDocument(data: { employeeId: string; docType: string; fileName: string; fileSize?: string; category?: string; fileData?: string }): Promise<DocumentItem> {
     const res = await fetch(`${API_BASE}/documents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

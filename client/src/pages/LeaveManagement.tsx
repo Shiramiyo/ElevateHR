@@ -87,7 +87,8 @@ export const LeaveManagement: React.FC = () => {
       });
       setIsActionModalOpen(false);
       fetchLeaves();
-    } catch (err) {
+    } catch (err: any) {
+      alert(err.message || 'Failed to process leave request');
       console.error('Failed to process leave request:', err);
     }
   };
